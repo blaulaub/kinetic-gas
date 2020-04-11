@@ -84,6 +84,27 @@ struct ParticleParticleCollision : public Collision
   ): Collision(time), particle1(particle1), particle2(particle2) {}
 };
 
+optional<ParticleParticleCollision> ofNext(Particle &part1, Particle &part2)
+{
+  double x1 = part1.position[0] - part2.position[0];
+  double x2 = part1.position[1] - part2.position[1];
+  double x3 = part1.position[2] - part2.position[2];
+  double v1 = part1.velocity[0] - part2.velocity[0];
+  double v2 = part1.velocity[1] - part2.velocity[1];
+  double v3 = part1.velocity[2] - part2.velocity[2];
+  double k1 = v1*x1 + v2*x2 + v3*x3;
+  double k2 = v1*v1 + v2*v2 + v3*v3;
+  double k3 = x1*x1 + x2*x2 + x3*x3 - 4*r*r;
+  double k4 = 1./k2;
+  double k5 = -k1*k4;
+  double k6 = -k3*k4;
+  double k7 = (k5*k5 + k6);
+  if (k7 < 0) return nullopt;
+  double k8 = k5 - sqrt(k7);
+  if (k8 < 0) return nullopt;
+  return ParticleParticleCollision(k8, part1, part2);
+}
+
 void collide(Wall wall1, Particle part1)
 {
   double v1 = part1.velocity[0];
@@ -225,28 +246,14 @@ int main(int argc, char** args)
   // init particle collisions
   for(int i = 0; i < particles.size()-1; i++)
   {
-    auto& part1 = particles[i];
     for(int j = i+1; j < particles.size(); j++)
     {
-      auto &part2 = particles[j];
-      double x1 = part1.position[0] - part2.position[0];
-      double x2 = part1.position[1] - part2.position[1];
-      double x3 = part1.position[2] - part2.position[2];
-      double v1 = part1.velocity[0] - part2.velocity[0];
-      double v2 = part1.velocity[1] - part2.velocity[1];
-      double v3 = part1.velocity[2] - part2.velocity[2];
-      double k1 = v1*x1 + v2*x2 + v3*x3;
-      double k2 = v1*v1 + v2*v2 + v3*v3;
-      double k3 = x1*x1 + x2*x2 + x3*x3 - 4*r*r;
-      double k4 = 1./k2;
-      double k5 = -k1*k4;
-      double k6 = -k3*k4;
-      double k7 = (k5*k5 + k6);
-      if (k7 < 0) continue;
-      double k8 = k5 - sqrt(k7);
-      if (k8 < 0) continue;
-      cout << "collision " << i << " x " << j << " in " << k8 << " sec." << endl;
-      ParticleParticleCollision collision = { k8, part1, part2 };
+      auto optCollision = ofNext(particles[i], particles[j]);
+      if (optCollision)
+      {
+        ParticleParticleCollision collision = optCollision.value();
+        cout << "collision " << i << " x " << j << " in " << collision.time << " sec." << endl;
+      }
     }
   }
 
