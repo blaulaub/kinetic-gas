@@ -25,6 +25,39 @@ struct Wall
   double offset;
 };
 
+struct Collision
+{
+  double time;
+  Collision(double time): time(time) {}
+};
+
+bool operator <(const Collision &a, const Collision &b)
+{
+  return a.time < b.time;
+};
+
+struct WallParticleCollision : public Collision
+{
+  Wall &wall;
+  Particle &particle;
+  WallParticleCollision(
+    double time,
+    Wall &wall,
+    Particle &particle
+  ): Collision(time), wall(wall), particle(particle) {}
+};
+
+struct ParticleParticleCollision : public Collision
+{
+  Particle &particle1;
+  Particle &particle2;
+  ParticleParticleCollision(
+    double time,
+    Particle &particle1,
+    Particle &particle2
+  ): Collision(time), particle1(particle1), particle2(particle2) {}
+};
+
 void collide(Wall wall1, Particle part1)
 {
   double v1 = part1.velocity[0];
@@ -34,9 +67,11 @@ void collide(Wall wall1, Particle part1)
   double w2 = wall1.norm[1];
   double w3 = wall1.norm[2];
   double k1 = v1*w1 + v2*w2 + v3*w3;
-  part1.velocity[0] = v1 - 2*k1*w1;
-  part1.velocity[1] = v2 - 2*k1*w2;
-  part1.velocity[2] = v3 - 2*k1*w3;
+  part1.velocity = {
+    v1 - 2*k1*w1,
+    v2 - 2*k1*w2,
+    v3 - 2*k1*w3
+  };
   // TODO update next collisions for part1
 }
 
@@ -60,12 +95,16 @@ void collide(Particle part1, Particle part2)
   double k5 = w2*(v12-v22);
   double k6 = w3*(v13-v23);
   // TODO the signs could be wrong
-  part1.velocity[0] = v11 - k4;
-  part1.velocity[1] = v12 - k5;
-  part1.velocity[2] = v13 - k6;
-  part2.velocity[0] = v21 - k4;
-  part2.velocity[1] = v22 - k5;
-  part2.velocity[2] = v23 - k6;
+  part1.velocity = {
+    v11 - k4,
+    v12 - k5,
+    v13 - k6
+  };
+  part2.velocity = {
+    v21 - k4,
+    v22 - k5,
+    v23 - k6
+  };
   // TODO update next collisions for part1
   // TODO update next collisions for part2
 }
@@ -96,7 +135,7 @@ int main(int argc, char** args)
   // initialize
   for(int i = 0; i < particles.size(); i++)
   {
-    auto& part1 = particles[i];
+    auto &part1 = particles[i];
     while (true) {
       part1.position[0] = r + (max_x-2*r) * unif(rng);
       part1.position[1] = r + (max_y-2*r) * unif(rng);
@@ -153,7 +192,7 @@ int main(int argc, char** args)
     auto& part1 = particles[i];
     for(int j = 0; j < walls.size(); j++)
     {
-      auto& wall1 = walls[j];
+      auto &wall1 = walls[j];
       double x1 = part1.position[0];
       double x2 = part1.position[1];
       double x3 = part1.position[2];
@@ -169,6 +208,7 @@ int main(int argc, char** args)
       double k3 = -k2/k1;
       if (k3 < 0) continue;
       cout << "collision " << i << " w " << j << " in " << k3 << " sec." << endl;
+      WallParticleCollision collison = { k3, wall1, part1 };
       // TODO only the earliest wall collision is of interest
     }
   }
@@ -179,7 +219,7 @@ int main(int argc, char** args)
     auto& part1 = particles[i];
     for(int j = i+1; j < particles.size(); j++)
     {
-      auto& part2 = particles[j];
+      auto &part2 = particles[j];
       double x1 = part1.position[0] - part2.position[0];
       double x2 = part1.position[1] - part2.position[1];
       double x3 = part1.position[2] - part2.position[2];
@@ -197,6 +237,7 @@ int main(int argc, char** args)
       double k8 = k5 - sqrt(k7);
       if (k8 < 0) continue;
       cout << "collision " << i << " x " << j << " in " << k8 << " sec." << endl;
+      ParticleParticleCollision collision = { k8, part1, part2 };
     }
   }
 
