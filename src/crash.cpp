@@ -26,6 +26,53 @@ struct Particle
   array<double,3> velocity;
 };
 
+vector<Particle> particlesWithinOriginCubicle(double extent, int count)
+{
+  vector<Particle> particles(count);
+
+  // initialize
+  for(int i = 0; i < count; i++)
+  {
+    auto &part1 = particles[i];
+    while (true) {
+      part1.position[0] = r + (extent-2*r) * unif(rng);
+      part1.position[1] = r + (extent-2*r) * unif(rng);
+      part1.position[2] = r + (extent-2*r) * unif(rng);
+      bool accept = true;
+      for(int j = 0; j < i; j++)
+      {
+        auto& part2 = particles[j];
+        double x1 = part1.position[0] - part2.position[0];
+        double x2 = part1.position[1] - part2.position[1];
+        double x3 = part1.position[2] - part2.position[2];
+        double k3 = x1*x1 + x2*x2 + x3*x3 - 4*r*r;
+        if (k3 < 0)
+        {
+          accept = false;
+          break;
+        }
+      }
+      if (accept) break;
+    }
+
+    while (true)
+    {
+      double alpha = M_PI * unif(rng);
+      double r = sin(alpha);
+      double b = unif(rng);
+      if (b < r) {
+        double beta = b/r*2*M_PI;
+        part1.velocity[0] = max_v * r * cos(beta);
+        part1.velocity[1] = max_v * r * sin(beta);
+        part1.velocity[2] = max_v * cos(alpha);
+        break;
+      }
+    }
+  }
+
+  return particles;
+}
+
 struct Wall
 {
   array<double,3> norm;
@@ -176,47 +223,7 @@ int main(int argc, char** args)
 
   vector<Wall> walls = originCubicWalls(1.);
 
-  vector<Particle> particles(100);
-
-  // initialize
-  for(int i = 0; i < particles.size(); i++)
-  {
-    auto &part1 = particles[i];
-    while (true) {
-      part1.position[0] = r + (max_x-2*r) * unif(rng);
-      part1.position[1] = r + (max_y-2*r) * unif(rng);
-      part1.position[2] = r + (max_z-2*r) * unif(rng);
-      bool accept = true;
-      for(int j = 0; j < i; j++)
-      {
-        auto& part2 = particles[j];
-        double x1 = part1.position[0] - part2.position[0];
-        double x2 = part1.position[1] - part2.position[1];
-        double x3 = part1.position[2] - part2.position[2];
-        double k3 = x1*x1 + x2*x2 + x3*x3 - 4*r*r;
-        if (k3 < 0)
-        {
-          accept = false;
-          break;
-        }
-      }
-      if (accept) break;
-    }
-
-    while (true)
-    {
-      double alpha = M_PI * unif(rng);
-      double r = sin(alpha);
-      double b = unif(rng);
-      if (b < r) {
-        double beta = b/r*2*M_PI;
-        part1.velocity[0] = max_v * r * cos(beta);
-        part1.velocity[1] = max_v * r * sin(beta);
-        part1.velocity[2] = max_v * cos(alpha);
-        break;
-      }
-    }
-  }
+  vector<Particle> particles = particlesWithinOriginCubicle(1., 100);
 
   // dump
   for(auto particle = particles.begin(); particle != particles.end(); particle++)
