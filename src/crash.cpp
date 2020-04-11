@@ -32,6 +32,18 @@ struct Wall
   double offset;
 };
 
+vector<Wall> originCubicWalls(double extend)
+{
+  return {
+    { { extend, 0., 0.}, 0. },
+    { {-extend, 0., 0.}, extend },
+    { { 0., extend, 0.}, 0. },
+    { { 0.,-extend, 0.}, extend },
+    { { 0., 0., extend}, 0. },
+    { { 0., 0.,-extend}, extend }
+  };
+}
+
 struct Collision
 {
   double time;
@@ -162,14 +174,7 @@ int main(int argc, char** args)
   std::seed_seq ss{uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed>>32)};
   rng.seed(ss);
 
-  vector<Wall> walls = {
-    { { 1., 0., 0.}, 0. },
-    { {-1., 0., 0.}, 1. },
-    { { 0., 1., 0.}, 0. },
-    { { 0.,-1., 0.}, 1. },
-    { { 0., 0., 1.}, 0. },
-    { { 0., 0.,-1.}, 1. }
-  };
+  vector<Wall> walls = originCubicWalls(1.);
 
   vector<Particle> particles(100);
 
