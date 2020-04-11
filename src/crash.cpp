@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <list>
+#include <optional>
 
 #include <cmath>
 
@@ -46,6 +47,11 @@ struct WallParticleCollision : public Collision
     Particle &particle
   ): Collision(time), wall(wall), particle(particle) {}
 };
+
+optional<WallParticleCollision> ofNext()
+{
+  return nullopt;
+}
 
 struct ParticleParticleCollision : public Collision
 {
