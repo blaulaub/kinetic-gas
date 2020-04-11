@@ -14,6 +14,12 @@ using namespace std;
 mt19937_64 rng;
 uniform_real_distribution<double> unif(0, 1);
 
+const double max_x = 1.;
+const double max_y = 1.;
+const double max_z = 1.;
+const double max_v = 1.;
+const double r = 0.02;
+
 struct Particle
 {
   array<double,3> position;
@@ -120,12 +126,6 @@ int main(int argc, char** args)
   uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
   std::seed_seq ss{uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed>>32)};
   rng.seed(ss);
-
-  const double max_x = 1.;
-  const double max_y = 1.;
-  const double max_z = 1.;
-  const double max_v = 1.;
-  const double r = 0.02;
 
   vector<Wall> walls = {
     { { 1., 0., 0.}, 0. },
