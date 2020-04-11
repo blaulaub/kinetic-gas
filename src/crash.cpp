@@ -54,9 +54,23 @@ struct WallParticleCollision : public Collision
   ): Collision(time), wall(wall), particle(particle) {}
 };
 
-optional<WallParticleCollision> ofNext()
+optional<WallParticleCollision> ofNext(Wall &wall1, Particle &part1)
 {
-  return nullopt;
+  double x1 = part1.position[0];
+  double x2 = part1.position[1];
+  double x3 = part1.position[2];
+  double v1 = part1.velocity[0];
+  double v2 = part1.velocity[1];
+  double v3 = part1.velocity[2];
+  double w1 = wall1.norm[0];
+  double w2 = wall1.norm[1];
+  double w3 = wall1.norm[2];
+  double wo = wall1.offset;
+  double k1 = w1*v1 + w2*v2 + w3*v3;
+  double k2 = w1*x1 + w2*x2 + w3*x3 + wo - r;
+  double k3 = -k2/k1;
+  if (k3 < 0) return nullopt;
+  return WallParticleCollision(k3, wall1, part1);
 }
 
 struct ParticleParticleCollision : public Collision
@@ -198,24 +212,13 @@ int main(int argc, char** args)
     auto& part1 = particles[i];
     for(int j = 0; j < walls.size(); j++)
     {
-      auto &wall1 = walls[j];
-      double x1 = part1.position[0];
-      double x2 = part1.position[1];
-      double x3 = part1.position[2];
-      double v1 = part1.velocity[0];
-      double v2 = part1.velocity[1];
-      double v3 = part1.velocity[2];
-      double w1 = wall1.norm[0];
-      double w2 = wall1.norm[1];
-      double w3 = wall1.norm[2];
-      double wo = wall1.offset;
-      double k1 = w1*v1 + w2*v2 + w3*v3;
-      double k2 = w1*x1 + w2*x2 + w3*x3 + wo - r;
-      double k3 = -k2/k1;
-      if (k3 < 0) continue;
-      cout << "collision " << i << " w " << j << " in " << k3 << " sec." << endl;
-      WallParticleCollision collison = { k3, wall1, part1 };
-      // TODO only the earliest wall collision is of interest
+      auto optCollision = ofNext(walls[j], particles[i]);
+      if (optCollision)
+      {
+        WallParticleCollision collision = optCollision.value();
+        cout << "collision " << i << " w " << j << " in " << collision.time << " sec." << endl;
+        // TODO only the earliest wall collision is of interest
+      }
     }
   }
 
