@@ -35,12 +35,29 @@ int main(int argc, char** args)
   const double r = 0.02;
 
   // initialize
-  for(auto particle = particles.begin(); particle != particles.end(); particle++)
+  for(int i = 0; i < particles.size()-1; i++)
   {
-    particle->position[0] = r + (max_x-2*r) * unif(rng);
-    particle->position[1] = r + (max_y-2*r) * unif(rng);
-    particle->position[2] = r + (max_z-2*r) * unif(rng);
-    // TODO avoid overlap
+    auto& part1 = particles[i];
+    while (true) {
+      part1.position[0] = r + (max_x-2*r) * unif(rng);
+      part1.position[1] = r + (max_y-2*r) * unif(rng);
+      part1.position[2] = r + (max_z-2*r) * unif(rng);
+      bool accept = true;
+      for(int j = 0; j < i; j++)
+      {
+        auto& part2 = particles[j];
+        double x1 = part1.position[0] - part2.position[0];
+        double x2 = part1.position[1] - part2.position[1];
+        double x3 = part1.position[2] - part2.position[2];
+        double k3 = x1*x1 + x2*x2 + x3*x3 - 4*r*r;
+        if (k3 < 0)
+        {
+          accept = false;
+          break;
+        }
+      }
+      if (accept) break;
+    }
 
     while (true)
     {
@@ -49,9 +66,9 @@ int main(int argc, char** args)
       double b = unif(rng);
       if (b < r) {
         double beta = b/r*2*M_PI;
-        particle->velocity[0] = max_v * r * cos(beta);
-        particle->velocity[1] = max_v * r * sin(beta);
-        particle->velocity[2] = max_v * cos(alpha);
+        part1.velocity[0] = max_v * r * cos(beta);
+        part1.velocity[1] = max_v * r * sin(beta);
+        part1.velocity[2] = max_v * cos(alpha);
         break;
       }
     }
