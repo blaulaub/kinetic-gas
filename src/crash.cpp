@@ -19,6 +19,11 @@ struct Particle
   array<double,3> velocity;
 };
 
+struct Wall
+{
+  array<double,3> norm;
+  double offset;
+};
 
 int main(int argc, char** args)
 {
@@ -26,16 +31,25 @@ int main(int argc, char** args)
   std::seed_seq ss{uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed>>32)};
   rng.seed(ss);
 
-  vector<Particle> particles(100);
-
   const double max_x = 1.;
   const double max_y = 1.;
   const double max_z = 1.;
   const double max_v = 1.;
   const double r = 0.02;
 
+  vector<Wall> walls = {
+    { { 1., 0., 0.}, 0. },
+    { {-1., 0., 0.}, 1. },
+    { { 0., 1., 0.}, 0. },
+    { { 0.,-1., 0.}, 1. },
+    { { 0., 0., 1.}, 0. },
+    { { 0., 0.,-1.}, 1. }
+  };
+
+  vector<Particle> particles(100);
+
   // initialize
-  for(int i = 0; i < particles.size()-1; i++)
+  for(int i = 0; i < particles.size(); i++)
   {
     auto& part1 = particles[i];
     while (true) {
@@ -88,7 +102,33 @@ int main(int argc, char** args)
       << endl;
   }
 
-  // init collisions
+  // init wall collisions
+  for(int i = 0; i < particles.size(); i++)
+  {
+    auto& part1 = particles[i];
+    for(int j = 0; j < walls.size(); j++)
+    {
+      auto& wall1 = walls[j];
+      double x1 = part1.position[0];
+      double x2 = part1.position[1];
+      double x3 = part1.position[2];
+      double v1 = part1.velocity[0];
+      double v2 = part1.velocity[1];
+      double v3 = part1.velocity[2];
+      double w1 = wall1.norm[0];
+      double w2 = wall1.norm[1];
+      double w3 = wall1.norm[2];
+      double wo = wall1.offset;
+      double k1 = w1*v1 + w2*v2 + w3*v3;
+      double k2 = w1*x1 + w2*x2 + w3*x3 + wo - r;
+      double k3 = -k2/k1;
+      if (k3 < 0) continue;
+      cout << "collision " << i << " w " << j << " in " << k3 << " sec." << endl;
+      // TODO only the earliest wall collision is of interest
+    }
+  }
+
+  // init particle collisions
   for(int i = 0; i < particles.size()-1; i++)
   {
     auto& part1 = particles[i];
@@ -114,8 +154,6 @@ int main(int argc, char** args)
       cout << "collision " << i << " x " << j << " in " << k8 << " sec." << endl;
     }
   }
-
-
 
   return 0;
 }
