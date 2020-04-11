@@ -26,6 +26,22 @@ struct Particle
   array<double,3> velocity;
 };
 
+void dump(ostream &target, const vector<Particle> particles)
+{
+  for(auto particle = particles.begin(); particle != particles.end(); particle++)
+  {
+    target
+      << setprecision(2)
+      << particle->position[0] << " ; "
+      << particle->position[1] << " ; "
+      << particle->position[2] << "   "
+      << particle->velocity[0] << " ; "
+      << particle->velocity[1] << " ; "
+      << particle->velocity[2] << "   "
+      << endl;
+  }
+}
+
 vector<Particle> particlesWithinOriginCubicle(double extent, int count)
 {
   vector<Particle> particles(count);
@@ -226,18 +242,7 @@ int main(int argc, char** args)
   vector<Particle> particles = particlesWithinOriginCubicle(1., 100);
 
   // dump
-  for(auto particle = particles.begin(); particle != particles.end(); particle++)
-  {
-    cout
-      << setprecision(2)
-      << particle->position[0] << " ; "
-      << particle->position[1] << " ; "
-      << particle->position[2] << "   "
-      << particle->velocity[0] << " ; "
-      << particle->velocity[1] << " ; "
-      << particle->velocity[2] << "   "
-      << endl;
-  }
+  dump(cout, particles);
 
   // init wall collisions
   for(int i = 0; i < particles.size(); i++)
