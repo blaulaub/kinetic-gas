@@ -247,7 +247,6 @@ int main(int argc, char** args)
   // init wall collisions
   for(int i = 0; i < particles.size(); i++)
   {
-    auto& part1 = particles[i];
     for(int j = 0; j < walls.size(); j++)
     {
       auto optCollision = ofNext(walls[j], particles[i]);
