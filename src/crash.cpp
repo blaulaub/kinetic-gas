@@ -32,6 +32,8 @@ const double max_z = 1.;
 const double max_v = 1.;
 const double r = 0.02;
 
+const bool twoDee = true;
+
 struct Particle
 {
   array<double,3> position;
@@ -49,7 +51,7 @@ vector<Particle> particlesWithinOriginCubicle(double extent, int count)
     while (true) {
       part1.position[0] = r + (extent-2*r) * unif(rng);
       part1.position[1] = r + (extent-2*r) * unif(rng);
-      part1.position[2] = r + (extent-2*r) * unif(rng);
+      part1.position[2] = twoDee ? extent/2 : r + (extent-2*r) * unif(rng);
       bool accept = true;
       for(int j = 0; j < i; j++)
       {
@@ -69,7 +71,7 @@ vector<Particle> particlesWithinOriginCubicle(double extent, int count)
 
     while (true)
     {
-      double alpha = M_PI * unif(rng);
+      double alpha = twoDee ? M_PI/2 : M_PI * unif(rng);
       double r = sin(alpha);
       double b = unif(rng);
       if (b < r) {
@@ -303,7 +305,7 @@ int main(int argc, char** args)
 
   vector<Particle> particles = particlesWithinOriginCubicle(1., 100);
 
-  const auto FPS = 25;
+  const auto FPS = 50;
 
   avcodec_register_all();
   AVCodec *codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
@@ -370,28 +372,29 @@ int main(int argc, char** args)
 
   double time = 0.;
   double nextFrameTime = 0.;
-  while (time < 10.)
+  while (time < 20.)
   {
     auto nextWallParticleCollision = ofNext(walls, particles);
     auto nextParticleCollision = ofNext(particles);
-    double timeToNextFrame = nextFrameTime - time;
 
     // TODO computing next collision each time over is a) inefficient and b) could be inaccurate
 
-
     tuple<Event, double> deltaT;
+
     bool particleBeforeWall = nextParticleCollision && nextParticleCollision.value().time < nextWallParticleCollision.value().time;
     if (particleBeforeWall)
     {
       deltaT = { WALL_PARTICLE, nextParticleCollision.value().time };
     }
-    else if (timeToNextFrame < nextWallParticleCollision.value().time)
-    {
-      deltaT = { FRAME, timeToNextFrame };
-    }
     else
     {
       deltaT = { PARTICLE_PARTICLE, nextWallParticleCollision.value().time };
+    }
+
+    double timeToNextFrame = nextFrameTime - time;
+    if (timeToNextFrame < get<1>(deltaT))
+    {
+      deltaT = { FRAME, timeToNextFrame };
     }
 
     // advance particles
@@ -411,7 +414,7 @@ int main(int argc, char** args)
     else if (get<0>(deltaT) == FRAME )
     {
       cairo_set_source_rgb(cr, 1., 1., 1.);
-      cairo_paint (cr);
+      cairo_paint(cr);
 
       cairo_set_source_rgb(cr, 1., 0., 0.);
       cairo_set_line_width(cr, 1);
