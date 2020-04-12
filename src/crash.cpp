@@ -17,6 +17,8 @@
 extern "C" {
   #include <libavcodec/avcodec.h>
   #include <libswscale/swscale.h>
+
+  #include <cairo/cairo.h>
 }
 
 using namespace std;
@@ -272,6 +274,23 @@ void collide(Particle &part1, Particle &part2)
   };
 }
 
+void encode(AVCodecContext *c, AVFrame *yuvpic, AVPacket *avpkt, FILE *f)
+{
+  int ret = avcodec_send_frame(c, yuvpic);
+  while (ret >= 0)
+  {
+    ret = avcodec_receive_packet(c, avpkt);
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) break;
+    if (ret < 0) {
+      fprintf(stderr, "error while encoding\n");
+      exit(1);
+    }
+    printf("encoded frame (size=%5d)\n", avpkt->size);
+    fwrite(avpkt->data, 1, avpkt->size, f);
+    av_packet_unref(avpkt);
+  }
+}
+
 enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
 
 int main(int argc, char** args)
@@ -304,14 +323,29 @@ int main(int argc, char** args)
   c->max_b_frames=1;
   c->pix_fmt = AV_PIX_FMT_YUV420P;
 
-  AVFrame *picture = av_frame_alloc();
-  picture->format = c->pix_fmt;
-  picture->width  = c->width;
-  picture->height = c->height;
-  if (av_frame_get_buffer(picture, 32) < 0) {
-    fprintf(stderr, "could not alloc the frame data\n");
+  AVFrame *yuvpic = av_frame_alloc();
+  yuvpic->format = c->pix_fmt;
+  yuvpic->width  = c->width;
+  yuvpic->height = c->height;
+  if (av_frame_get_buffer(yuvpic, 32) < 0) {
+    fprintf(stderr, "could not alloc the YUV frame data\n");
     exit(1);
   }
+
+  AVFrame *rgbpic = av_frame_alloc();
+  rgbpic->format = AV_PIX_FMT_RGB24;
+  rgbpic->width  = c->width;
+  rgbpic->height = c->height;
+  if (av_frame_get_buffer(rgbpic, 32) < 0) {
+    fprintf(stderr, "could not alloc the RGB frame data\n");
+    exit(1);
+  }
+
+  SwsContext *sws = sws_getContext(
+    yuvpic->width, yuvpic->height, AV_PIX_FMT_RGB24,
+    yuvpic->width, yuvpic->height, AV_PIX_FMT_YUV420P,
+    0, 0, 0, 0
+  );
 
   if (avcodec_open2(c, codec, NULL) < 0) {
     fprintf(stderr, "could not open codec\n");
@@ -330,6 +364,10 @@ int main(int argc, char** args)
     exit(1);
   }
 
+  cairo_surface_t *surface = cairo_image_surface_create(
+    CAIRO_FORMAT_RGB24, rgbpic->width, rgbpic->height);
+  cairo_t * const cr = cairo_create(surface);
+
   double time = 0.;
   double nextFrameTime = 0.;
   while (time < 10.)
@@ -339,6 +377,7 @@ int main(int argc, char** args)
     double timeToNextFrame = nextFrameTime - time;
 
     // TODO computing next collision each time over is a) inefficient and b) could be inaccurate
+
 
     tuple<Event, double> deltaT;
     bool particleBeforeWall = nextParticleCollision && nextParticleCollision.value().time < nextWallParticleCollision.value().time;
@@ -371,23 +410,40 @@ int main(int argc, char** args)
     }
     else if (get<0>(deltaT) == FRAME )
     {
-      //uint8_t * inData[1] = { picture_buf }; // RGB24 have one plane
-      //int inLinesize[1] = { 3*c->width }; // RGB stride
-      //sws_scale(ctx, inData, inLinesize, 0, c->height, dst_picture.data, dst_picture.linesize);
+      cairo_set_source_rgb(cr, 1., 1., 1.);
+      cairo_paint (cr);
 
-      int ret = avcodec_send_frame(c, picture);
-      while (ret >= 0)
+      cairo_set_source_rgb(cr, 1., 0., 0.);
+      cairo_set_line_width(cr, 1);
+      for(int i = 0; i < particles.size(); i++)
       {
-        ret = avcodec_receive_packet(c, avpkt);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) break;
-        if (ret < 0) {
-          fprintf(stderr, "error while encoding\n");
-          exit(1);
-        }
-        printf("encoded frame (size=%5d)\n", avpkt->size);
-        fwrite(avpkt->data, 1, avpkt->size, f);
-        av_packet_unref(avpkt);
+        cairo_arc(cr,
+          particles[i].position[0]*800,
+          particles[i].position[1]*800,
+          r*800, 0, 2*M_PI);
+        cairo_close_path(cr);
+        cairo_stroke_preserve(cr);
+        cairo_fill(cr);
+        // cairo_stroke_preserve(cr);
+        // cairo_fill(cr);
       }
+
+      uint8_t *s = cairo_image_surface_get_data(surface);
+      uint8_t *d = rgbpic->data[0];
+      for (int i = 0; i<rgbpic->height; ++i)
+      {
+        for (int j = 0; j<rgbpic->width; ++j)
+        {
+          *(d+0) = *(s+2);
+          *(d+1) = *(s+1);
+          *(d+2) = *(s+0);
+          s+=4;
+          d+=3;
+        }
+      }
+
+      sws_scale(sws, rgbpic->data, rgbpic->linesize, 0, rgbpic->height, yuvpic->data, yuvpic->linesize);
+      encode(c, yuvpic, avpkt, f);
       nextFrameTime += 1./FPS;
     }
     else
@@ -396,10 +452,11 @@ int main(int argc, char** args)
     }
   }
 
+  encode(c, NULL, avpkt, f);
   fclose(f);
 
   avcodec_free_context(&c);
-  av_frame_free(&picture);
+  av_frame_free(&yuvpic);
   av_packet_free(&avpkt);
 
   return 0;
