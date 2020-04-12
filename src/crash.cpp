@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <list>
 #include <optional>
+#include <tuple>
 
 #include <cmath>
 
@@ -150,9 +151,7 @@ optional<WallParticleCollision> ofNext(Wall &wall1, Particle &part1)
 
 optional<WallParticleCollision> ofNext(vector<Wall> &walls, vector<Particle> particles)
 {
-  Wall *w = nullptr;
-  Particle *p = nullptr;
-  double t;
+  tuple<bool, double, Wall*, Particle*> next = make_tuple(false, 0, nullptr, nullptr);
   for(int i = 0; i < particles.size(); i++)
   {
     for(int j = 0; j < walls.size(); j++)
@@ -161,16 +160,14 @@ optional<WallParticleCollision> ofNext(vector<Wall> &walls, vector<Particle> par
       if (optCollision)
       {
         WallParticleCollision collision = optCollision.value();
-        if (w == nullptr || t > collision.time)
+        if (!get<0>(next) || get<1>(next) > collision.time)
         {
-          w = &collision.wall;
-          p = &collision.particle;
-          t = collision.time;
+          next = make_tuple(true, collision.time, &collision.wall, &collision.particle);
         }
       }
     }
   }
-  if (w != nullptr) return WallParticleCollision(t, *w, *p);
+  if (get<0>(next)) return WallParticleCollision(get<1>(next), *(get<2>(next)), *(get<3>(next)));
   return nullopt;
 }
 
