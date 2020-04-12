@@ -203,6 +203,28 @@ optional<ParticleParticleCollision> ofNext(Particle &part1, Particle &part2)
   return ParticleParticleCollision(k8, part1, part2);
 }
 
+optional<ParticleParticleCollision> ofNext(vector<Particle> &particles)
+{
+  tuple<bool, double, Particle*, Particle*> next = make_tuple(false, 0, nullptr, nullptr);
+  for(int i = 0; i < particles.size()-1; i++)
+  {
+    for(int j = i+1; j < particles.size(); j++)
+    {
+      auto optCollision = ofNext(particles[i], particles[j]);
+      if (optCollision)
+      {
+        ParticleParticleCollision collision = optCollision.value();
+        if (!get<0>(next) || get<1>(next) > collision.time)
+        {
+          next = make_tuple(true, collision.time, &collision.particle1, &collision.particle2);
+        }
+      }
+    }
+  }
+  if (get<0>(next)) return ParticleParticleCollision(get<1>(next), *(get<2>(next)), *(get<3>(next)));
+  return nullopt;
+}
+
 void collide(Wall wall1, Particle part1)
 {
   double v1 = part1.velocity[0];
@@ -275,17 +297,10 @@ int main(int argc, char** args)
   }
 
   // init particle collisions
-  for(int i = 0; i < particles.size()-1; i++)
+  auto nextParticleCollision = ofNext(particles);
+  if (nextParticleCollision)
   {
-    for(int j = i+1; j < particles.size(); j++)
-    {
-      auto optCollision = ofNext(particles[i], particles[j]);
-      if (optCollision)
-      {
-        ParticleParticleCollision collision = optCollision.value();
-        cout << "collision " << i << " x " << j << " in " << collision.time << " sec." << endl;
-      }
-    }
+    cout << "next particle collision in " << nextParticleCollision.value().time << " sec." << endl;
   }
 
   return 0;
