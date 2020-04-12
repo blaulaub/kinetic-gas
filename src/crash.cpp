@@ -148,6 +148,32 @@ optional<WallParticleCollision> ofNext(Wall &wall1, Particle &part1)
   return WallParticleCollision(k3, wall1, part1);
 }
 
+optional<WallParticleCollision> ofNext(vector<Wall> &walls, vector<Particle> particles)
+{
+  Wall *w = nullptr;
+  Particle *p = nullptr;
+  double t;
+  for(int i = 0; i < particles.size(); i++)
+  {
+    for(int j = 0; j < walls.size(); j++)
+    {
+      auto optCollision = ofNext(walls[j], particles[i]);
+      if (optCollision)
+      {
+        WallParticleCollision collision = optCollision.value();
+        if (w == nullptr || t > collision.time)
+        {
+          w = &collision.wall;
+          p = &collision.particle;
+          t = collision.time;
+        }
+      }
+    }
+  }
+  if (w != nullptr) return WallParticleCollision(t, *w, *p);
+  return nullopt;
+}
+
 struct ParticleParticleCollision : public Collision
 {
   Particle &particle1;
@@ -245,18 +271,10 @@ int main(int argc, char** args)
   dump(cout, particles);
 
   // init wall collisions
-  for(int i = 0; i < particles.size(); i++)
+  auto nextWallParticleCollision = ofNext(walls, particles);
+  if (nextWallParticleCollision)
   {
-    for(int j = 0; j < walls.size(); j++)
-    {
-      auto optCollision = ofNext(walls[j], particles[i]);
-      if (optCollision)
-      {
-        WallParticleCollision collision = optCollision.value();
-        cout << "collision " << i << " w " << j << " in " << collision.time << " sec." << endl;
-        // TODO only the earliest wall collision is of interest
-      }
-    }
+    cout << "next wall collision in " << nextWallParticleCollision.value().time << " sec." << endl;
   }
 
   // init particle collisions
