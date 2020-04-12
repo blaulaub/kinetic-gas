@@ -11,8 +11,8 @@ d compute particle-particle collision time
 d compute particle-wall collision time
 d compute particle-particle collision effect
 d compute particle-wall collision effect
+d time marching with respect to collisions
 
-t time marching with respect to collisions
 t time marching with respect to video frames
 t render image
 t render video

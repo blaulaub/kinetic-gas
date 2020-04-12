@@ -10,6 +10,15 @@
 
 #include <cmath>
 
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+
+extern "C" {
+  #include <libavcodec/avcodec.h>
+  #include <libswscale/swscale.h>
+}
+
 using namespace std;
 
 mt19937_64 rng;
@@ -263,6 +272,8 @@ void collide(Particle &part1, Particle &part2)
   };
 }
 
+enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
+
 int main(int argc, char** args)
 {
   uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
@@ -273,46 +284,123 @@ int main(int argc, char** args)
 
   vector<Particle> particles = particlesWithinOriginCubicle(1., 100);
 
+  const auto FPS = 25;
+
+  avcodec_register_all();
+  AVCodec *codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
+  if (!codec) {
+    fprintf(stderr, "codec not found\n");
+    exit(1);
+  }
+
+  AVCodecContext *c = avcodec_alloc_context3(codec);
+
+  c->bit_rate = 400000;
+  c->width = 800;
+  c->height = 800;
+  c->time_base = (AVRational){1,FPS};
+  c->framerate = (AVRational){FPS,1};
+  c->gop_size = 10; /* emit one intra frame every ten frames */
+  c->max_b_frames=1;
+  c->pix_fmt = AV_PIX_FMT_YUV420P;
+
+  AVFrame *picture = av_frame_alloc();
+  picture->format = c->pix_fmt;
+  picture->width  = c->width;
+  picture->height = c->height;
+  if (av_frame_get_buffer(picture, 32) < 0) {
+    fprintf(stderr, "could not alloc the frame data\n");
+    exit(1);
+  }
+
+  if (avcodec_open2(c, codec, NULL) < 0) {
+    fprintf(stderr, "could not open codec\n");
+    exit(1);
+  }
+
+  FILE *f = fopen("crash.mpg", "wb");
+  if (!f) {
+    fprintf(stderr, "could not open %s\n", "crash.mpg");
+    exit(1);
+  }
+
+  AVPacket *avpkt = av_packet_alloc();
+  if (!avpkt) {
+    fprintf(stderr, "could not alloc pkt\n");
+    exit(1);
+  }
+
   double time = 0.;
+  double nextFrameTime = 0.;
   while (time < 10.)
   {
     auto nextWallParticleCollision = ofNext(walls, particles);
     auto nextParticleCollision = ofNext(particles);
+    double timeToNextFrame = nextFrameTime - time;
+
     // TODO computing next collision each time over is a) inefficient and b) could be inaccurate
 
-    double deltaT;
-    bool nextIsParticleCollision = nextParticleCollision && nextParticleCollision.value().time < nextWallParticleCollision.value().time;
-    if (nextIsParticleCollision)
+    tuple<Event, double> deltaT;
+    bool particleBeforeWall = nextParticleCollision && nextParticleCollision.value().time < nextWallParticleCollision.value().time;
+    if (particleBeforeWall)
     {
-      cout << "next particle collision in " << nextParticleCollision.value().time << " sec." << endl;
-      deltaT = nextParticleCollision.value().time;
+      deltaT = { WALL_PARTICLE, nextParticleCollision.value().time };
+    }
+    else if (timeToNextFrame < nextWallParticleCollision.value().time)
+    {
+      deltaT = { FRAME, timeToNextFrame };
     }
     else
     {
-      cout << "next wall collision in " << nextWallParticleCollision.value().time << " sec." << endl;
-      deltaT = nextWallParticleCollision.value().time;
+      deltaT = { PARTICLE_PARTICLE, nextWallParticleCollision.value().time };
     }
 
     // advance particles
     for(int i = 0; i < particles.size(); i++)
     {
-      particles[i].position[0] += particles[i].velocity[0] * deltaT;
-      particles[i].position[1] += particles[i].velocity[1] * deltaT;
-      particles[i].position[2] += particles[i].velocity[2] * deltaT;
+      particles[i].position[0] += particles[i].velocity[0] * get<1>(deltaT);
+      particles[i].position[1] += particles[i].velocity[1] * get<1>(deltaT);
+      particles[i].position[2] += particles[i].velocity[2] * get<1>(deltaT);
     }
-    time += deltaT;
+    time += get<1>(deltaT);
 
     // update collision
-    if (nextIsParticleCollision)
+    if (get<0>(deltaT) == WALL_PARTICLE)
     {
       collide(nextParticleCollision.value().particle1, nextParticleCollision.value().particle2);
+    }
+    else if (get<0>(deltaT) == FRAME )
+    {
+      //uint8_t * inData[1] = { picture_buf }; // RGB24 have one plane
+      //int inLinesize[1] = { 3*c->width }; // RGB stride
+      //sws_scale(ctx, inData, inLinesize, 0, c->height, dst_picture.data, dst_picture.linesize);
+
+      int ret = avcodec_send_frame(c, picture);
+      while (ret >= 0)
+      {
+        ret = avcodec_receive_packet(c, avpkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) break;
+        if (ret < 0) {
+          fprintf(stderr, "error while encoding\n");
+          exit(1);
+        }
+        printf("encoded frame (size=%5d)\n", avpkt->size);
+        fwrite(avpkt->data, 1, avpkt->size, f);
+        av_packet_unref(avpkt);
+      }
+      nextFrameTime += 1./FPS;
     }
     else
     {
       collide(nextWallParticleCollision.value().wall, nextWallParticleCollision.value().particle);
     }
-
   }
+
+  fclose(f);
+
+  avcodec_free_context(&c);
+  av_frame_free(&picture);
+  av_packet_free(&avpkt);
 
   return 0;
 }
