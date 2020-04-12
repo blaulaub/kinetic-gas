@@ -1,0 +1,44 @@
+d - done
+t - todo
+o - option
+
+d define particle
+d define wall
+d init particles (unit particles)
+d init walls (unit cube)
+d define collision
+d compute particle-particle collision time
+d compute particle-wall collision time
+d compute particle-particle collision effect
+d compute particle-wall collision effect
+
+t time marching with respect to collisions
+t time marching with respect to video frames
+t render image
+t render video
+t save state
+t load state
+t compute overall particle energy
+t compute overall wall pressure
+
+o unit sphere
+o unit tube
+o rough walls
+o inner energy
+o particles with higher DoF (coupled particles)
+
+particle: has location and velocity
+
+unit particle: a particle with a unit mass and globally constant radius
+
+init unit particles: with velocity 1, randomly equaly distributed in all
+  directions
+
+wall: a plane, directed (with front), unbounded
+
+unit cube: six planes forming an inward facing (enclosing) cube of size 1
+
+collision time: time when two objects are making surface contact
+
+collision effect: exchange of momentum due to collision, alters the momentum
+  of involved objects
