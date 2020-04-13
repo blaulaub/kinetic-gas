@@ -1,7 +1,4 @@
 
-#include <array>
-#include <random>
-#include <chrono>
 #include <iostream>
 #include <iomanip>
 #include <list>
@@ -31,9 +28,6 @@ using namespace std;
 
 RandomNumberSource rns;
 
-const double max_x = 1.;
-const double max_y = 1.;
-const double max_z = 1.;
 const double max_v = 1.;
 const double r = 0.02;
 
@@ -43,18 +37,18 @@ ParticleFactory particleFactory(max_v, r, twoDee);
 
 WallFactory wallFactory;
 
-struct Collision
+struct Timed
 {
-  double time;
-  Collision(double time): time(time) {}
+  const double time;
+  Timed(double time): time(time) {}
 };
 
-bool operator <(const Collision &a, const Collision &b)
+bool operator <(const Timed &a, const Timed &b)
 {
   return a.time < b.time;
 };
 
-struct WallParticleCollision : public Collision
+struct WallParticleCollision : public Timed
 {
   Wall &wall;
   Particle &particle;
@@ -62,7 +56,7 @@ struct WallParticleCollision : public Collision
     double time,
     Wall &wall,
     Particle &particle
-  ): Collision(time), wall(wall), particle(particle) {}
+  ): Timed(time), wall(wall), particle(particle) {}
 };
 
 optional<WallParticleCollision> ofNext(Wall &wall1, Particle &part1)
@@ -107,7 +101,7 @@ optional<WallParticleCollision> ofNext(vector<Wall> &walls, vector<Particle> &pa
   return nullopt;
 }
 
-struct ParticleParticleCollision : public Collision
+struct ParticleParticleCollision : public Timed
 {
   Particle &particle1;
   Particle &particle2;
@@ -115,7 +109,7 @@ struct ParticleParticleCollision : public Collision
     double time,
     Particle &particle1,
     Particle &particle2
-  ): Collision(time), particle1(particle1), particle2(particle2) {}
+  ): Timed(time), particle1(particle1), particle2(particle2) {}
 };
 
 optional<ParticleParticleCollision> ofNext(Particle &part1, Particle &part2)
