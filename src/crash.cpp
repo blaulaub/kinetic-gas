@@ -1,22 +1,11 @@
-
-#include <iostream>
-#include <iomanip>
-#include <list>
 #include <optional>
 #include <tuple>
-
-#include <cmath>
-
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
 
 #include "particle.h"
 #include "wall.h"
 #include "util/random_number_source.h"
 #include "particle_factory.h"
 #include "wall_factory.h"
-#include "timed.h"
 #include "particle_particle_collision.h"
 #include "wall_particle_collision.h"
 #include "collision_predictor.h"
