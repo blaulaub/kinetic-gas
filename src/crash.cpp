@@ -21,10 +21,14 @@ extern "C" {
   #include <cairo/cairo.h>
 }
 
+#include "particle.h"
+#include "wall.h"
+#include "particle_factory.h"
+#include "random_number_source.h"
+
 using namespace std;
 
-mt19937_64 rng;
-uniform_real_distribution<double> unif(0, 1);
+RandomNumberSource rns;
 
 const double max_x = 1.;
 const double max_y = 1.;
@@ -34,64 +38,7 @@ const double r = 0.02;
 
 const bool twoDee = true;
 
-struct Particle
-{
-  array<double,3> position;
-  array<double,3> velocity;
-};
-
-vector<Particle> particlesWithinOriginCubicle(double extent, int count)
-{
-  vector<Particle> particles(count);
-
-  // initialize
-  for(int i = 0; i < count; i++)
-  {
-    auto &part1 = particles[i];
-    while (true) {
-      part1.position[0] = r + (extent-2*r) * unif(rng);
-      part1.position[1] = r + (extent-2*r) * unif(rng);
-      part1.position[2] = twoDee ? extent/2 : r + (extent-2*r) * unif(rng);
-      bool accept = true;
-      for(int j = 0; j < i; j++)
-      {
-        auto& part2 = particles[j];
-        double x1 = part1.position[0] - part2.position[0];
-        double x2 = part1.position[1] - part2.position[1];
-        double x3 = part1.position[2] - part2.position[2];
-        double k3 = x1*x1 + x2*x2 + x3*x3 - 4*r*r;
-        if (k3 < 0)
-        {
-          accept = false;
-          break;
-        }
-      }
-      if (accept) break;
-    }
-
-    while (true)
-    {
-      double alpha = twoDee ? M_PI/2 : M_PI * unif(rng);
-      double r = sin(alpha);
-      double b = unif(rng);
-      if (b < r) {
-        double beta = b/r*2*M_PI;
-        part1.velocity[0] = max_v * r * cos(beta);
-        part1.velocity[1] = max_v * r * sin(beta);
-        part1.velocity[2] = max_v * cos(alpha);
-        break;
-      }
-    }
-  }
-
-  return particles;
-}
-
-struct Wall
-{
-  array<double,3> norm;
-  double offset;
-};
+ParticleFactory particleFactory(max_v, r, twoDee);
 
 vector<Wall> originCubicWalls(double extend)
 {
@@ -296,13 +243,9 @@ enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
 
 int main(int argc, char** args)
 {
-  uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-  std::seed_seq ss{uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed>>32)};
-  rng.seed(ss);
-
   vector<Wall> walls = originCubicWalls(1.);
 
-  vector<Particle> particles = particlesWithinOriginCubicle(1., 100);
+  vector<Particle> particles = particleFactory.inOriginCubicle(rns, 1., 100);
 
   const auto FPS = 50;
 
