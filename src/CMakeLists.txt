@@ -1,5 +1,6 @@
 add_executable(crash
   crash.cpp
+  video_renderer.cpp
 )
 
 find_library( AVCODEC avcodec )

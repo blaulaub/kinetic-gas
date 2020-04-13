@@ -27,6 +27,7 @@ extern "C" {
 #include "particle_particle_collision.h"
 #include "wall_particle_collision.h"
 #include "collision_predictor.h"
+#include "video_renderer.h"
 
 using namespace std;
 
@@ -166,28 +167,14 @@ int main(int argc, char** args)
 
   const auto FPS = 50;
 
-  // avcodec_register_all();
-  AVCodec *codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
-  if (!codec) {
-    fprintf(stderr, "codec not found\n");
-    exit(1);
-  }
-
-  AVCodecContext *c = avcodec_alloc_context3(codec);
-
-  c->bit_rate = 400000;
-  c->width = 800;
-  c->height = 800;
-  c->time_base = (AVRational){1,FPS};
-  c->framerate = (AVRational){FPS,1};
-  c->gop_size = 10; /* emit one intra frame every ten frames */
-  c->max_b_frames=1;
-  c->pix_fmt = AV_PIX_FMT_YUV420P;
+  const int width = 800;
+  const int height = 800;
+  VideoRenderer videoRenderer("crash.mpg", width, height, FPS);
 
   AVFrame *yuvpic = av_frame_alloc();
-  yuvpic->format = c->pix_fmt;
-  yuvpic->width  = c->width;
-  yuvpic->height = c->height;
+  yuvpic->format = AV_PIX_FMT_YUV420P;
+  yuvpic->width  = width;
+  yuvpic->height = height;
   if (av_frame_get_buffer(yuvpic, 32) < 0) {
     fprintf(stderr, "could not alloc the YUV frame data\n");
     exit(1);
@@ -195,35 +182,18 @@ int main(int argc, char** args)
 
   AVFrame *rgbpic = av_frame_alloc();
   rgbpic->format = AV_PIX_FMT_RGB24;
-  rgbpic->width  = c->width;
-  rgbpic->height = c->height;
+  rgbpic->width  = width;
+  rgbpic->height = height;
   if (av_frame_get_buffer(rgbpic, 32) < 0) {
     fprintf(stderr, "could not alloc the RGB frame data\n");
     exit(1);
   }
 
   SwsContext *sws = sws_getContext(
-    yuvpic->width, yuvpic->height, AV_PIX_FMT_RGB24,
-    yuvpic->width, yuvpic->height, AV_PIX_FMT_YUV420P,
+    width, height, AV_PIX_FMT_RGB24,
+    rgbpic->width, rgbpic->height, AV_PIX_FMT_YUV420P,
     0, 0, 0, 0
   );
-
-  if (avcodec_open2(c, codec, NULL) < 0) {
-    fprintf(stderr, "could not open codec\n");
-    exit(1);
-  }
-
-  FILE *f = fopen("crash.mpg", "wb");
-  if (!f) {
-    fprintf(stderr, "could not open %s\n", "crash.mpg");
-    exit(1);
-  }
-
-  AVPacket *avpkt = av_packet_alloc();
-  if (!avpkt) {
-    fprintf(stderr, "could not alloc pkt\n");
-    exit(1);
-  }
 
   cairo_surface_t *surface = cairo_image_surface_create(
     CAIRO_FORMAT_RGB24, rgbpic->width, rgbpic->height);
@@ -305,7 +275,7 @@ int main(int argc, char** args)
       }
 
       sws_scale(sws, rgbpic->data, rgbpic->linesize, 0, rgbpic->height, yuvpic->data, yuvpic->linesize);
-      encode(c, yuvpic, avpkt, f);
+      videoRenderer.encode(yuvpic);
       nextFrameTime += 1./FPS;
     }
     else
@@ -314,12 +284,7 @@ int main(int argc, char** args)
     }
   }
 
-  encode(c, NULL, avpkt, f);
-  fclose(f);
-
-  avcodec_free_context(&c);
   av_frame_free(&yuvpic);
-  av_packet_free(&avpkt);
 
   return 0;
 }
