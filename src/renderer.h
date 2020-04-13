@@ -3,24 +3,15 @@
 #include <vector>
 #include <string>
 
-extern "C" {
-  #include <libavcodec/avcodec.h>
-  #include <libswscale/swscale.h>
-}
-
-#include "bitmap_renderer.h"
-#include "video_file_output.h"
 #include "particle.h"
 
 class Renderer
 {
+  class Impl;
+
 private:
 
-  VideoFileOutput videoFileOutput;
-  BitmapRenderer bitmapRenderer;
-  AVFrame *rgbpic;
-  AVFrame *yuvpic;
-  SwsContext *sws;
+  Impl  *impl;
 
 public:
 
