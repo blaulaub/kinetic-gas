@@ -125,6 +125,8 @@ void collide(Particle &part1, Particle &part2)
 
 enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
 
+typedef tuple<Event, double> TimedEvent;
+
 int main(int argc, char** args)
 {
   vector<Wall> walls = wallFactory.originCubicWalls(1.);
@@ -145,23 +147,16 @@ int main(int argc, char** args)
 
     // TODO computing next collision each time over is a) inefficient and b) could be inaccurate
 
-    tuple<Event, double> deltaT;
+    TimedEvent deltaT;
 
-    bool particleBeforeWall = nextParticleCollision && nextParticleCollision.value().time < nextWallParticleCollision.value().time;
-    if (particleBeforeWall)
-    {
-      deltaT = { WALL_PARTICLE, nextParticleCollision.value().time };
-    }
-    else
-    {
-      deltaT = { PARTICLE_PARTICLE, nextWallParticleCollision.value().time };
-    }
+    deltaT = nextParticleCollision && nextParticleCollision.value().time < nextWallParticleCollision.value().time
+      ? (TimedEvent){ WALL_PARTICLE, nextParticleCollision.value().time }
+      : (TimedEvent){ PARTICLE_PARTICLE, nextWallParticleCollision.value().time };
 
     double timeToNextFrame = nextFrameTime - time;
-    if (timeToNextFrame < get<1>(deltaT))
-    {
-      deltaT = { FRAME, timeToNextFrame };
-    }
+    deltaT = timeToNextFrame < get<1>(deltaT)
+      ? (TimedEvent){ FRAME, timeToNextFrame }
+      : deltaT;
 
     // advance particles
     for(int i = 0; i < particles.size(); i++)
