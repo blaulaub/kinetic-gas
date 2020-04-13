@@ -20,7 +20,7 @@
 #include "particle_particle_collision.h"
 #include "wall_particle_collision.h"
 #include "collision_predictor.h"
-#include "renderer.h"
+#include "renderer/renderer.h"
 
 using namespace std;
 

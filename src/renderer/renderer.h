@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "particle.h"
+#include "../particle.h"
 
 class Renderer
 {

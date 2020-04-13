@@ -1,8 +1,8 @@
 add_executable(crash
+  renderer/bitmap_renderer.cpp
+  renderer/video_file_output.cpp
+  renderer/renderer.cpp
   crash.cpp
-  bitmap_renderer.cpp
-  video_file_output.cpp
-  renderer.cpp
 )
 
 find_library( AVCODEC avcodec )
