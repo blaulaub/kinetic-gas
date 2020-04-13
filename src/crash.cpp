@@ -26,6 +26,16 @@ WallFactory wallFactory;
 
 CollisionPredictor collisionPredictor(r);
 
+void advance(vector<Particle> &particles, double deltaT)
+{
+  for(int i = 0; i < particles.size(); i++)
+  {
+    particles[i].position[0] += particles[i].velocity[0] * deltaT;
+    particles[i].position[1] += particles[i].velocity[1] * deltaT;
+    particles[i].position[2] += particles[i].velocity[2] * deltaT;
+  }
+}
+
 // TODO since this computes over all elements, it is only ok for initialization but bad for book-keeping
 optional<WallParticleCollision> ofNext(vector<Wall> &walls, vector<Particle> &particles)
 {
@@ -159,12 +169,7 @@ int main(int argc, char** args)
       : deltaT;
 
     // advance particles
-    for(int i = 0; i < particles.size(); i++)
-    {
-      particles[i].position[0] += particles[i].velocity[0] * get<1>(deltaT);
-      particles[i].position[1] += particles[i].velocity[1] * get<1>(deltaT);
-      particles[i].position[2] += particles[i].velocity[2] * get<1>(deltaT);
-    }
+    advance(particles, get<1>(deltaT));
     time += get<1>(deltaT);
 
     // update collision
