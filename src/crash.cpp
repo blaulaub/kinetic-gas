@@ -27,7 +27,7 @@ extern "C" {
 #include "particle_particle_collision.h"
 #include "wall_particle_collision.h"
 #include "collision_predictor.h"
-#include "video_renderer.h"
+#include "video_file_output.h"
 
 using namespace std;
 
@@ -169,7 +169,7 @@ int main(int argc, char** args)
 
   const int width = 800;
   const int height = 800;
-  VideoRenderer videoRenderer("crash.mpg", width, height, FPS);
+  VideoFileOutput videoFileOutput("crash.mpg", width, height, FPS);
 
   AVFrame *yuvpic = av_frame_alloc();
   yuvpic->format = AV_PIX_FMT_YUV420P;
@@ -275,7 +275,7 @@ int main(int argc, char** args)
       }
 
       sws_scale(sws, rgbpic->data, rgbpic->linesize, 0, rgbpic->height, yuvpic->data, yuvpic->linesize);
-      videoRenderer.encode(yuvpic);
+      videoFileOutput.encode(yuvpic);
       nextFrameTime += 1./FPS;
     }
     else

@@ -8,7 +8,7 @@ class AVCodecContext;
 class AVFrame;
 class AVPacket;
 
-class VideoRenderer
+class VideoFileOutput
 {
 private:
 
@@ -24,9 +24,9 @@ private:
 
 public:
 
-  VideoRenderer(const std::string& filename, int width, int height, int fps);
+  VideoFileOutput(const std::string& filename, int width, int height, int fps);
 
-  ~VideoRenderer();
+  ~VideoFileOutput();
 
   void encode(AVFrame *yuvpic);
 };

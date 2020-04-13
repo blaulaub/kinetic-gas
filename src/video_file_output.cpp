@@ -2,9 +2,9 @@ extern "C" {
   #include <libavcodec/avcodec.h>
 }
 
-#include "video_renderer.h"
+#include "video_file_output.h"
 
-VideoRenderer::VideoRenderer(const std::string& filename, int width, int height, int fps)
+VideoFileOutput::VideoFileOutput(const std::string& filename, int width, int height, int fps)
 : _filename(filename), _width(width), _height(height)
 {
 
@@ -44,7 +44,7 @@ VideoRenderer::VideoRenderer(const std::string& filename, int width, int height,
 
 }
 
-VideoRenderer::~VideoRenderer()
+VideoFileOutput::~VideoFileOutput()
 {
   encode(NULL);
   fclose(f);
@@ -53,7 +53,7 @@ VideoRenderer::~VideoRenderer()
   av_packet_free(&avpkt);
 }
 
-void VideoRenderer::encode(AVFrame *yuvpic)
+void VideoFileOutput::encode(AVFrame *yuvpic)
 {
   int ret = avcodec_send_frame(c, yuvpic);
   while (ret >= 0)
