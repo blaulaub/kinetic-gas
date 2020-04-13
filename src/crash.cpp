@@ -287,7 +287,6 @@ void encode(AVCodecContext *c, AVFrame *yuvpic, AVPacket *avpkt, FILE *f)
       fprintf(stderr, "error while encoding\n");
       exit(1);
     }
-    printf("encoded frame (size=%5d)\n", avpkt->size);
     fwrite(avpkt->data, 1, avpkt->size, f);
     av_packet_unref(avpkt);
   }
@@ -307,7 +306,7 @@ int main(int argc, char** args)
 
   const auto FPS = 50;
 
-  avcodec_register_all();
+  // avcodec_register_all();
   AVCodec *codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
   if (!codec) {
     fprintf(stderr, "codec not found\n");
