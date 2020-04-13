@@ -14,8 +14,6 @@
 extern "C" {
   #include <libavcodec/avcodec.h>
   #include <libswscale/swscale.h>
-
-  #include <cairo/cairo.h>
 }
 
 #include "particle.h"
