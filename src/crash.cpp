@@ -28,6 +28,7 @@ extern "C" {
 #include "wall_particle_collision.h"
 #include "collision_predictor.h"
 #include "video_file_output.h"
+#include "bitmap_renderer.h"
 
 using namespace std;
 
@@ -195,9 +196,7 @@ int main(int argc, char** args)
     0, 0, 0, 0
   );
 
-  cairo_surface_t *surface = cairo_image_surface_create(
-    CAIRO_FORMAT_RGB24, rgbpic->width, rgbpic->height);
-  cairo_t * const cr = cairo_create(surface);
+  BitmapRenderer bitmapRenderer(rgbpic->width, rgbpic->height, 800);
 
   double time = 0.;
   double nextFrameTime = 0.;
@@ -242,25 +241,7 @@ int main(int argc, char** args)
     }
     else if (get<0>(deltaT) == FRAME )
     {
-      cairo_set_source_rgb(cr, 1., 1., 1.);
-      cairo_paint(cr);
-
-      cairo_set_source_rgb(cr, 1., 0., 0.);
-      cairo_set_line_width(cr, 1);
-      for(int i = 0; i < particles.size(); i++)
-      {
-        cairo_arc(cr,
-          particles[i].position[0]*800,
-          particles[i].position[1]*800,
-          r*800, 0, 2*M_PI);
-        cairo_close_path(cr);
-        cairo_stroke_preserve(cr);
-        cairo_fill(cr);
-        // cairo_stroke_preserve(cr);
-        // cairo_fill(cr);
-      }
-
-      uint8_t *s = cairo_image_surface_get_data(surface);
+      uint8_t *s = bitmapRenderer.render(r, particles);
       uint8_t *d = rgbpic->data[0];
       for (int i = 0; i<rgbpic->height; ++i)
       {

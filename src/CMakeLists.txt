@@ -1,5 +1,6 @@
 add_executable(crash
   crash.cpp
+  bitmap_renderer.cpp
   video_file_output.cpp
 )
 
