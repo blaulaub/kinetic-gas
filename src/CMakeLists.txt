@@ -1,4 +1,5 @@
 add_executable(crash
+  util/random_number_source.cpp
   renderer/bitmap_renderer.cpp
   renderer/video_file_output.cpp
   renderer/renderer.cpp

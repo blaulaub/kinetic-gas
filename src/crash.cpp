@@ -13,7 +13,7 @@
 
 #include "particle.h"
 #include "wall.h"
-#include "random_number_source.h"
+#include "util/random_number_source.h"
 #include "particle_factory.h"
 #include "wall_factory.h"
 #include "timed.h"

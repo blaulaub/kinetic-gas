@@ -4,7 +4,7 @@
 #include <random>
 
 #include "particle.h"
-#include "random_number_source.h"
+#include "util/random_number_source.h"
 
 class ParticleFactory
 {
