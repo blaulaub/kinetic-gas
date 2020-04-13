@@ -173,18 +173,20 @@ int main(int argc, char** args)
     time += get<1>(deltaT);
 
     // update collision
-    if (get<0>(deltaT) == WALL_PARTICLE)
+    switch(get<0>(deltaT))
     {
-      collide(nextParticleCollision.value().particle1, nextParticleCollision.value().particle2);
-    }
-    else if (get<0>(deltaT) == FRAME )
-    {
-      renderer.render(r, particles);
-      nextFrameTime += 1./FPS;
-    }
-    else
-    {
-      collide(nextWallParticleCollision.value().wall, nextWallParticleCollision.value().particle);
+      case WALL_PARTICLE:
+        collide(nextParticleCollision.value().particle1, nextParticleCollision.value().particle2);
+        break;
+      case PARTICLE_PARTICLE:
+        collide(nextWallParticleCollision.value().wall, nextWallParticleCollision.value().particle);
+        break;
+      case FRAME:
+        renderer.render(r, particles);
+        nextFrameTime += 1./FPS;
+        break;
+      default:
+        exit(-1);
     }
   }
 
