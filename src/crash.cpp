@@ -23,6 +23,7 @@ extern "C" {
 #include "random_number_source.h"
 #include "particle_factory.h"
 #include "wall_factory.h"
+#include "timed.h"
 
 using namespace std;
 
@@ -36,17 +37,6 @@ const bool twoDee = true;
 ParticleFactory particleFactory(max_v, r, twoDee);
 
 WallFactory wallFactory;
-
-struct Timed
-{
-  const double time;
-  Timed(double time): time(time) {}
-};
-
-bool operator <(const Timed &a, const Timed &b)
-{
-  return a.time < b.time;
-};
 
 struct WallParticleCollision : public Timed
 {
