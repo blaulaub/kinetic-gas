@@ -23,8 +23,9 @@ extern "C" {
 
 #include "particle.h"
 #include "wall.h"
-#include "particle_factory.h"
 #include "random_number_source.h"
+#include "particle_factory.h"
+#include "wall_factory.h"
 
 using namespace std;
 
@@ -40,17 +41,7 @@ const bool twoDee = true;
 
 ParticleFactory particleFactory(max_v, r, twoDee);
 
-vector<Wall> originCubicWalls(double extend)
-{
-  return {
-    { { 1., 0., 0.},     0. },
-    { {-1., 0., 0.}, extend },
-    { { 0., 1., 0.},     0. },
-    { { 0.,-1., 0.}, extend },
-    { { 0., 0., 1.},     0. },
-    { { 0., 0.,-1.}, extend }
-  };
-}
+WallFactory wallFactory;
 
 struct Collision
 {
@@ -243,7 +234,7 @@ enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
 
 int main(int argc, char** args)
 {
-  vector<Wall> walls = originCubicWalls(1.);
+  vector<Wall> walls = wallFactory.originCubicWalls(1.);
 
   vector<Particle> particles = particleFactory.inOriginCubicle(rns, 1., 100);
 
