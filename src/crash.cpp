@@ -11,11 +11,6 @@
 #include <cstdio>
 #include <cstring>
 
-extern "C" {
-  #include <libavcodec/avcodec.h>
-  #include <libswscale/swscale.h>
-}
-
 #include "particle.h"
 #include "wall.h"
 #include "random_number_source.h"
@@ -25,8 +20,7 @@ extern "C" {
 #include "particle_particle_collision.h"
 #include "wall_particle_collision.h"
 #include "collision_predictor.h"
-#include "video_file_output.h"
-#include "bitmap_renderer.h"
+#include "renderer.h"
 
 using namespace std;
 
@@ -168,33 +162,8 @@ int main(int argc, char** args)
 
   const int width = 800;
   const int height = 800;
-  VideoFileOutput videoFileOutput("crash.mpg", width, height, FPS);
 
-  AVFrame *yuvpic = av_frame_alloc();
-  yuvpic->format = AV_PIX_FMT_YUV420P;
-  yuvpic->width  = width;
-  yuvpic->height = height;
-  if (av_frame_get_buffer(yuvpic, 32) < 0) {
-    fprintf(stderr, "could not alloc the YUV frame data\n");
-    exit(1);
-  }
-
-  AVFrame *rgbpic = av_frame_alloc();
-  rgbpic->format = AV_PIX_FMT_RGB24;
-  rgbpic->width  = width;
-  rgbpic->height = height;
-  if (av_frame_get_buffer(rgbpic, 32) < 0) {
-    fprintf(stderr, "could not alloc the RGB frame data\n");
-    exit(1);
-  }
-
-  SwsContext *sws = sws_getContext(
-    width, height, AV_PIX_FMT_RGB24,
-    rgbpic->width, rgbpic->height, AV_PIX_FMT_YUV420P,
-    0, 0, 0, 0
-  );
-
-  BitmapRenderer bitmapRenderer(rgbpic->width, rgbpic->height, 800);
+  Renderer renderer("crash.mpg", width, height, 800, FPS);
 
   double time = 0.;
   double nextFrameTime = 0.;
@@ -239,22 +208,7 @@ int main(int argc, char** args)
     }
     else if (get<0>(deltaT) == FRAME )
     {
-      uint8_t *s = bitmapRenderer.render(r, particles);
-      uint8_t *d = rgbpic->data[0];
-      for (int i = 0; i<rgbpic->height; ++i)
-      {
-        for (int j = 0; j<rgbpic->width; ++j)
-        {
-          *(d+0) = *(s+2);
-          *(d+1) = *(s+1);
-          *(d+2) = *(s+0);
-          s+=4;
-          d+=3;
-        }
-      }
-
-      sws_scale(sws, rgbpic->data, rgbpic->linesize, 0, rgbpic->height, yuvpic->data, yuvpic->linesize);
-      videoFileOutput.encode(yuvpic);
+      renderer.render(r, particles);
       nextFrameTime += 1./FPS;
     }
     else
@@ -262,8 +216,6 @@ int main(int argc, char** args)
       collide(nextWallParticleCollision.value().wall, nextWallParticleCollision.value().particle);
     }
   }
-
-  av_frame_free(&yuvpic);
 
   return 0;
 }
