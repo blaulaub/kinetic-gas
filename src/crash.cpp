@@ -134,22 +134,6 @@ void collide(Particle &part1, Particle &part2)
   };
 }
 
-void encode(AVCodecContext *c, AVFrame *yuvpic, AVPacket *avpkt, FILE *f)
-{
-  int ret = avcodec_send_frame(c, yuvpic);
-  while (ret >= 0)
-  {
-    ret = avcodec_receive_packet(c, avpkt);
-    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) break;
-    if (ret < 0) {
-      fprintf(stderr, "error while encoding\n");
-      exit(1);
-    }
-    fwrite(avpkt->data, 1, avpkt->size, f);
-    av_packet_unref(avpkt);
-  }
-}
-
 enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
 
 int main(int argc, char** args)
@@ -159,10 +143,8 @@ int main(int argc, char** args)
   vector<Particle> particles = particleFactory.inOriginCubicle(rns, 1., 100);
 
   const auto FPS = 50;
-
   const int width = 800;
   const int height = 800;
-
   Renderer renderer("crash.mpg", width, height, 800, FPS);
 
   double time = 0.;
