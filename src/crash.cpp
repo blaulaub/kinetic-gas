@@ -24,6 +24,8 @@ extern "C" {
 #include "particle_factory.h"
 #include "wall_factory.h"
 #include "timed.h"
+#include "particle_particle_collision.h"
+#include "wall_particle_collision.h"
 
 using namespace std;
 
@@ -37,17 +39,6 @@ const bool twoDee = true;
 ParticleFactory particleFactory(max_v, r, twoDee);
 
 WallFactory wallFactory;
-
-struct WallParticleCollision : public Timed
-{
-  Wall &wall;
-  Particle &particle;
-  WallParticleCollision(
-    double time,
-    Wall &wall,
-    Particle &particle
-  ): Timed(time), wall(wall), particle(particle) {}
-};
 
 optional<WallParticleCollision> ofNext(Wall &wall1, Particle &part1)
 {
@@ -91,16 +82,6 @@ optional<WallParticleCollision> ofNext(vector<Wall> &walls, vector<Particle> &pa
   return nullopt;
 }
 
-struct ParticleParticleCollision : public Timed
-{
-  Particle &particle1;
-  Particle &particle2;
-  ParticleParticleCollision(
-    double time,
-    Particle &particle1,
-    Particle &particle2
-  ): Timed(time), particle1(particle1), particle2(particle2) {}
-};
 
 optional<ParticleParticleCollision> ofNext(Particle &part1, Particle &part2)
 {
