@@ -103,16 +103,8 @@ void collide(Particle &part1, Particle &part2)
   auto v1 = part1.velocity - part2.velocity;
   double k3 = v1 * w1;
   auto k4 = w1 * k3;
-  part1.velocity = {
-    v11 - k4[0],
-    v12 - k4[1],
-    v13 - k4[2]
-  };
-  part2.velocity = {
-    v21 + k4[0],
-    v22 + k4[1],
-    v23 + k4[2]
-  };
+  part1.velocity = part1.velocity - k4;
+  part2.velocity = part2.velocity + k4;
 }
 
 enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
