@@ -84,12 +84,6 @@ optional<ParticleParticleCollision> ofNext(vector<Particle> &particles)
 
 void collide(Wall &wall1, Particle &part1)
 {
-  double v1 = part1.velocity[0];
-  double v2 = part1.velocity[1];
-  double v3 = part1.velocity[2];
-  double w1 = wall1.norm[0];
-  double w2 = wall1.norm[1];
-  double w3 = wall1.norm[2];
   double k1 = part1.velocity * wall1.norm;
   part1.velocity = part1.velocity - 2 * k1 * wall1.norm;
 }
@@ -102,30 +96,22 @@ void collide(Particle &part1, Particle &part2)
   double v21 = part2.velocity[0];
   double v22 = part2.velocity[1];
   double v23 = part2.velocity[2];
-  double x1 = part1.position[0] - part2.position[0];
-  double x2 = part1.position[1] - part2.position[1];
-  double x3 = part1.position[2] - part2.position[2];
-  double k1 = x1*x1 + x2*x2 + x3*x3;
+  auto x = part1.position - part2.position;
+  double k1 = x * x;
   double k2 = 1./sqrt(k1);
-  double w1 = x1*k2;
-  double w2 = x2*k2;
-  double w3 = x3*k2;
-  double v1 = v11 - v21;
-  double v2 = v12 - v22;
-  double v3 = v13 - v23;
-  double k3 = v1*w1 + v2*w2 + v3*w3;
-  double k4 = w1*k3;
-  double k5 = w2*k3;
-  double k6 = w3*k3;
+  auto w1 = x * k2;
+  auto v1 = part1.velocity - part2.velocity;
+  double k3 = v1 * w1;
+  auto k4 = w1 * k3;
   part1.velocity = {
-    v11 - k4,
-    v12 - k5,
-    v13 - k6
+    v11 - k4[0],
+    v12 - k4[1],
+    v13 - k4[2]
   };
   part2.velocity = {
-    v21 + k4,
-    v22 + k5,
-    v23 + k6
+    v21 + k4[0],
+    v22 + k4[1],
+    v23 + k4[2]
   };
 }
 
