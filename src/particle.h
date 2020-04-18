@@ -3,10 +3,11 @@
 #include <array>
 
 #include "dynamic_object.h"
+#include "vec.h"
 
 class Particle: public DynamicObject
 {
 public:
-  std::array<double,3> position;
-  std::array<double,3> velocity;
+  Vec position;
+  Vec velocity;
 };

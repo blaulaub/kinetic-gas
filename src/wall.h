@@ -3,14 +3,15 @@
 #include <array>
 
 #include "dynamic_object.h"
+#include "vec.h"
 
 class Wall: public DynamicObject
 {
 public:
-  std::array<double,3> norm;
+  Vec norm;
   double offset;
 public:
-  Wall(std::array<double,3> norm, double offset)
+  Wall(Vec norm, double offset)
   : norm(norm), offset(offset)
   {}
 };
