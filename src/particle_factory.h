@@ -42,10 +42,8 @@ public:
         for(int j = 0; j < i; j++)
         {
           auto& part2 = particles[j];
-          double x1 = part1.position[0] - part2.position[0];
-          double x2 = part1.position[1] - part2.position[1];
-          double x3 = part1.position[2] - part2.position[2];
-          double k3 = x1*x1 + x2*x2 + x3*x3 - 4*r*r;
+          auto x1 = part1.position - part2.position;
+          double k3 = x1*x1 - 4*r*r;
           if (k3 < 0)
           {
             accept = false;
