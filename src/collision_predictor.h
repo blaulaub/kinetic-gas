@@ -29,8 +29,8 @@ public:
     auto v = part1.velocity - part2.velocity;
     double k1 = v * x;
     if (k1 >= 0) return std::nullopt;
-    double k2 = v * v;
-    double k3 = x * x - 4*_r*_r;
+    double k2 = v.norm();
+    double k3 = x.norm() - 4*_r*_r;
     double k4 = 1./k2;
     double k5 = -k1*k4;
     double k6 = -k3*k4;

@@ -43,7 +43,7 @@ public:
         {
           auto& part2 = particles[j];
           auto x1 = part1.position - part2.position;
-          double k3 = x1*x1 - 4*r*r;
+          double k3 = x1.norm() - 4*r*r;
           if (k3 < 0)
           {
             accept = false;
