@@ -24,9 +24,5 @@ public:
 
   // TODO a desctructor is needed
 
-  uint8_t* render(
-    // TODO radius r should be a particle property
-    const double r,
-    const std::vector<Particle> &particles
-  );
+  uint8_t* render(const std::vector<Particle> &particles);
 };

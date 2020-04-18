@@ -4,20 +4,13 @@
 
 class CollisionPredictor
 {
-private:
-
-  // TODO this could become a property of particle, not a class constant
-  double _r;
-
 public:
-
-  CollisionPredictor(double r) : _r(r) {}
 
   std::optional<WallParticleCollision> ofNext(Wall &wall1, Particle &part1)
   {
     double k1 = wall1.norm * part1.velocity;
     if (k1 >= 0) return std::nullopt;
-    double k2 = wall1.norm * part1.position + wall1.offset - _r;
+    double k2 = wall1.norm * part1.position + wall1.offset - part1.radius;
     double k3 = -k2/k1;
     if (k3 <= 0) return std::nullopt;
     return WallParticleCollision(k3, wall1, part1);
@@ -30,7 +23,8 @@ public:
     double k1 = v * x;
     if (k1 >= 0) return std::nullopt;
     double k2 = v.norm();
-    double k3 = x.norm() - 4*_r*_r;
+    double r = part1.radius + part2.radius;
+    double k3 = x.norm() - r*r;
     double k4 = 1./k2;
     double k5 = -k1*k4;
     double k6 = -k3*k4;

@@ -12,11 +12,7 @@ BitmapRenderer::BitmapRenderer(int width, int height, int scale)
   cr(cairo_create(surface))
 {}
 
-uint8_t* BitmapRenderer::render(
-  // TODO radius r should be a particle property
-  const double r,
-  const std::vector<Particle> &particles
-)
+uint8_t* BitmapRenderer::render(const std::vector<Particle> &particles)
 {
   cairo_set_source_rgb(cr, 1., 1., 1.);
   cairo_paint(cr);
@@ -28,7 +24,7 @@ uint8_t* BitmapRenderer::render(
     cairo_arc(cr,
       particles[i].position[0]*_scale,
       particles[i].position[1]*_scale,
-      r*_scale, 0, 2*M_PI);
+      particles[i].radius*_scale, 0, 2*M_PI);
     cairo_close_path(cr);
     cairo_stroke_preserve(cr);
     cairo_fill(cr);

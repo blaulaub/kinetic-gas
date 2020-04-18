@@ -10,4 +10,5 @@ class Particle: public DynamicObject
 public:
   Vec position;
   Vec velocity;
+  double radius;
 };

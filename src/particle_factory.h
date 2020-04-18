@@ -34,6 +34,7 @@ public:
     for(int i = 0; i < count; i++)
     {
       auto &part1 = particles[i];
+      part1.radius = r;
       while (true) {
         part1.position[0] = r + (extent-2*r) * rns.unif();
         part1.position[1] = r + (extent-2*r) * rns.unif();
@@ -43,7 +44,7 @@ public:
         {
           auto& part2 = particles[j];
           auto x1 = part1.position - part2.position;
-          double k3 = x1.norm() - 4*r*r;
+          double k3 = x1.norm() - r*r;
           if (k3 < 0)
           {
             accept = false;

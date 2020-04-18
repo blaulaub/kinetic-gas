@@ -19,9 +19,5 @@ public:
 
   ~Renderer();
 
-  void render(
-    // TODO radius r should be a particle property
-    double r,
-    const std::vector<Particle> &particles
-  );
+  void render(const std::vector<Particle> &particles);
 };

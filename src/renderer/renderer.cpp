@@ -56,13 +56,9 @@ public:
     // TODO free sws;
   }
 
-  void render(
-    // TODO radius r should be a particle property
-    double r,
-    const std::vector<Particle> &particles
-  )
+  void render(const std::vector<Particle> &particles)
   {
-    uint8_t *s = bitmapRenderer.render(r, particles);
+    uint8_t *s = bitmapRenderer.render(particles);
     uint8_t *d = rgbpic->data[0];
     for (int i = 0; i<rgbpic->height; ++i)
     {
@@ -89,11 +85,7 @@ Renderer::~Renderer()
   delete impl;
 }
 
-void Renderer::render(
-  // TODO radius r should be a particle property
-  double r,
-  const std::vector<Particle> &particles
-)
+void Renderer::render(const std::vector<Particle> &particles)
 {
-  impl->render(r, particles);
+  impl->render(particles);
 }

@@ -16,15 +16,14 @@ using namespace std;
 RandomNumberSource rns;
 
 const double max_v = 1.;
-const double r = 0.02;
 
 const bool twoDee = true;
 
-ParticleFactory particleFactory(max_v, r, twoDee);
+ParticleFactory particleFactory(max_v, 0.02, twoDee);
 
 WallFactory wallFactory;
 
-CollisionPredictor collisionPredictor(r);
+CollisionPredictor collisionPredictor;
 
 void advance(vector<Particle> &particles, double deltaT)
 {
@@ -148,7 +147,7 @@ int main(int argc, char** args)
         collide(nextWallParticleCollision.value().wall, nextWallParticleCollision.value().particle);
         break;
       case FRAME:
-        renderer.render(r, particles);
+        renderer.render(particles);
         nextFrameTime += 1./FPS;
         break;
       default:
