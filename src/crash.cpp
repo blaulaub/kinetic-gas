@@ -30,9 +30,7 @@ void advance(vector<Particle> &particles, double deltaT)
 {
   for(int i = 0; i < particles.size(); i++)
   {
-    particles[i].position[0] += particles[i].velocity[0] * deltaT;
-    particles[i].position[1] += particles[i].velocity[1] * deltaT;
-    particles[i].position[2] += particles[i].velocity[2] * deltaT;
+    particles[i].position += particles[i].velocity * deltaT;
   }
 }
 
@@ -90,12 +88,6 @@ void collide(Wall &wall1, Particle &part1)
 
 void collide(Particle &part1, Particle &part2)
 {
-  double v11 = part1.velocity[0];
-  double v12 = part1.velocity[1];
-  double v13 = part1.velocity[2];
-  double v21 = part2.velocity[0];
-  double v22 = part2.velocity[1];
-  double v23 = part2.velocity[2];
   auto x = part1.position - part2.position;
   double k1 = x * x;
   double k2 = 1./sqrt(k1);
