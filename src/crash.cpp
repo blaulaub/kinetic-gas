@@ -90,12 +90,8 @@ void collide(Wall &wall1, Particle &part1)
   double w1 = wall1.norm[0];
   double w2 = wall1.norm[1];
   double w3 = wall1.norm[2];
-  double k1 = v1*w1 + v2*w2 + v3*w3;
-  part1.velocity = {
-    v1 - 2*k1*w1,
-    v2 - 2*k1*w2,
-    v3 - 2*k1*w3
-  };
+  double k1 = part1.velocity * wall1.norm;
+  part1.velocity = part1.velocity - 2 * k1 * wall1.norm;
 }
 
 void collide(Particle &part1, Particle &part2)
