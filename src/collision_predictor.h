@@ -25,16 +25,12 @@ public:
 
   std::optional<ParticleParticleCollision> ofNext(Particle &part1, Particle &part2)
   {
-    double x1 = part1.position[0] - part2.position[0];
-    double x2 = part1.position[1] - part2.position[1];
-    double x3 = part1.position[2] - part2.position[2];
-    double v1 = part1.velocity[0] - part2.velocity[0];
-    double v2 = part1.velocity[1] - part2.velocity[1];
-    double v3 = part1.velocity[2] - part2.velocity[2];
-    double k1 = v1*x1 + v2*x2 + v3*x3;
+    auto x = part1.position - part2.position;
+    auto v = part1.velocity - part2.velocity;
+    double k1 = v * x;
     if (k1 >= 0) return std::nullopt;
-    double k2 = v1*v1 + v2*v2 + v3*v3;
-    double k3 = x1*x1 + x2*x2 + x3*x3 - 4*_r*_r;
+    double k2 = v * v;
+    double k3 = x * x - 4*_r*_r;
     double k4 = 1./k2;
     double k5 = -k1*k4;
     double k6 = -k3*k4;
