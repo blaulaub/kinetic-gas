@@ -15,16 +15,9 @@ public:
 
   std::optional<WallParticleCollision> ofNext(Wall &wall1, Particle &part1)
   {
-    double x1 = part1.position[0];
-    double x2 = part1.position[1];
-    double x3 = part1.position[2];
-    double w1 = wall1.norm[0];
-    double w2 = wall1.norm[1];
-    double w3 = wall1.norm[2];
-    double wo = wall1.offset;
     double k1 = wall1.norm * part1.velocity;
     if (k1 >= 0) return std::nullopt;
-    double k2 = w1*x1 + w2*x2 + w3*x3 + wo - _r;
+    double k2 = wall1.norm * part1.position + wall1.offset - _r;
     double k3 = -k2/k1;
     if (k3 <= 0) return std::nullopt;
     return WallParticleCollision(k3, wall1, part1);
