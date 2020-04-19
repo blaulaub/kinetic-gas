@@ -1,5 +1,6 @@
 #include <optional>
 #include <tuple>
+#include <memory>
 
 #include "particle.h"
 #include "wall.h"
@@ -13,7 +14,7 @@
 
 using namespace std;
 
-UniformUnitRandomSource uniformUnitRandomSource;
+std::shared_ptr<UniformUnitRandomSource> uniformUnitRandomSource = std::make_shared<UniformUnitRandomSource>();
 
 const double max_v = 1.;
 
