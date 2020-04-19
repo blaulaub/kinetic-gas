@@ -24,11 +24,10 @@ public:
   ) : max_v(initialVelocity), r(particleRadius), twoDee(twoDee) {}
 
   std::vector<Particle> inOriginCubicle(
-    // TODO its a bit ugly to have RNG as parameter
-    std::shared_ptr<UniformUnitRandomSource> &uniformUnitRandomSource,
     double extent,
     int count)
   {
+    UniformUnitRandomSource uniformUnitRandomSource;
     std::vector<Particle> particles(count);
 
     // initialize
@@ -37,9 +36,9 @@ public:
       auto &part1 = particles[i];
       part1.radius = r;
       while (true) {
-        part1.position[0] = r + (extent-2*r) * uniformUnitRandomSource->next();
-        part1.position[1] = r + (extent-2*r) * uniformUnitRandomSource->next();
-        part1.position[2] = twoDee ? extent/2 : r + (extent-2*r) * uniformUnitRandomSource->next();
+        part1.position[0] = r + (extent-2*r) * uniformUnitRandomSource.next();
+        part1.position[1] = r + (extent-2*r) * uniformUnitRandomSource.next();
+        part1.position[2] = twoDee ? extent/2 : r + (extent-2*r) * uniformUnitRandomSource.next();
         bool accept = true;
         for(int j = 0; j < i; j++)
         {
@@ -58,9 +57,9 @@ public:
 
       while (true)
       {
-        double alpha = twoDee ? M_PI/2 : M_PI * uniformUnitRandomSource->next();
+        double alpha = twoDee ? M_PI/2 : M_PI * uniformUnitRandomSource.next();
         double r = sin(alpha);
-        double b = uniformUnitRandomSource->next();
+        double b = uniformUnitRandomSource.next();
         if (b < r) {
           double beta = b/r*2*M_PI;
           part1.velocity[0] = max_v * r * cos(beta);

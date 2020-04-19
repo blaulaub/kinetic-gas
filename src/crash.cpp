@@ -14,8 +14,6 @@
 
 using namespace std;
 
-std::shared_ptr<UniformUnitRandomSource> uniformUnitRandomSource = std::make_shared<UniformUnitRandomSource>();
-
 const double max_v = 1.;
 
 const bool twoDee = true;
@@ -107,7 +105,7 @@ int main(int argc, char** args)
 {
   vector<Wall> walls = wallFactory.originCubicWalls(1.);
 
-  vector<Particle> particles = particleFactory.inOriginCubicle(uniformUnitRandomSource, 1., 100);
+  vector<Particle> particles = particleFactory.inOriginCubicle(1., 100);
 
   const auto FPS = 50;
   const int width = 800;
