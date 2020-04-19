@@ -4,7 +4,7 @@
 #include <random>
 
 #include "particle.h"
-#include "util/random_number_source.h"
+#include "util/uniform_unit_random_source.h"
 
 class ParticleFactory
 {
@@ -24,7 +24,7 @@ public:
 
   std::vector<Particle> inOriginCubicle(
     // TODO its a bit ugly to have RNG as parameter
-    RandomNumberSource &rns,
+    UniformUnitRandomSource &uniformUnitRandomSource,
     double extent,
     int count)
   {
@@ -36,9 +36,9 @@ public:
       auto &part1 = particles[i];
       part1.radius = r;
       while (true) {
-        part1.position[0] = r + (extent-2*r) * rns.unif();
-        part1.position[1] = r + (extent-2*r) * rns.unif();
-        part1.position[2] = twoDee ? extent/2 : r + (extent-2*r) * rns.unif();
+        part1.position[0] = r + (extent-2*r) * uniformUnitRandomSource.next();
+        part1.position[1] = r + (extent-2*r) * uniformUnitRandomSource.next();
+        part1.position[2] = twoDee ? extent/2 : r + (extent-2*r) * uniformUnitRandomSource.next();
         bool accept = true;
         for(int j = 0; j < i; j++)
         {
@@ -56,9 +56,9 @@ public:
 
       while (true)
       {
-        double alpha = twoDee ? M_PI/2 : M_PI * rns.unif();
+        double alpha = twoDee ? M_PI/2 : M_PI * uniformUnitRandomSource.next();
         double r = sin(alpha);
-        double b = rns.unif();
+        double b = uniformUnitRandomSource.next();
         if (b < r) {
           double beta = b/r*2*M_PI;
           part1.velocity[0] = max_v * r * cos(beta);

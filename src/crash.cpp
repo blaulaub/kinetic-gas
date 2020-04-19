@@ -3,7 +3,7 @@
 
 #include "particle.h"
 #include "wall.h"
-#include "util/random_number_source.h"
+#include "util/uniform_unit_random_source.h"
 #include "particle_factory.h"
 #include "wall_factory.h"
 #include "particle_particle_collision.h"
@@ -13,7 +13,7 @@
 
 using namespace std;
 
-RandomNumberSource rns;
+UniformUnitRandomSource uniformUnitRandomSource;
 
 const double max_v = 1.;
 
@@ -106,7 +106,7 @@ int main(int argc, char** args)
 {
   vector<Wall> walls = wallFactory.originCubicWalls(1.);
 
-  vector<Particle> particles = particleFactory.inOriginCubicle(rns, 1., 100);
+  vector<Particle> particles = particleFactory.inOriginCubicle(uniformUnitRandomSource, 1., 100);
 
   const auto FPS = 50;
   const int width = 800;
