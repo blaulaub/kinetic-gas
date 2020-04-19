@@ -20,7 +20,6 @@ const double max_v = 1.;
 
 const bool twoDee = true;
 
-ParticleFactory particleFactory(max_v, 0.02, twoDee);
 
 WallFactory wallFactory;
 
@@ -108,7 +107,7 @@ int main(int argc, char** args)
   const auto extend = 1.;
 
   vector<Wall> walls = wallFactory.originCubicWalls(extend);
-  vector<Particle> particles = particleFactory.inOriginCubicle(
+  vector<Particle> particles = ParticleFactory(twoDee).inOriginCubicle(
     extend,
     ConstantSource(0.02),
     RandomUnitVelocitySource(max_v, twoDee),

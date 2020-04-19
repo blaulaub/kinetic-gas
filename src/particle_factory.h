@@ -6,23 +6,18 @@
 #include "particle.h"
 #include "util/uniform_unit_random_source.h"
 #include "util/value_source.h"
+#include "util/random_ranged_double_source.h"
 #include "vec.h"
 
 class ParticleFactory
 {
 private:
 
-  const double max_v;
-  const double r;
   const bool twoDee;
 
 public:
 
-  ParticleFactory(
-    double initialVelocity,
-    double particleRadius,
-    bool twoDee = false
-  ) : max_v(initialVelocity), r(particleRadius), twoDee(twoDee) {}
+  ParticleFactory(bool twoDee = false): twoDee(twoDee) {}
 
   std::vector<Particle> inOriginCubicle(
     double extent,
@@ -38,10 +33,11 @@ public:
     {
       auto &part1 = particles[i];
       part1.radius = radiusSource.next();
+      RandomRangedDoubleSource xvalue(part1.radius, extent -2*part1.radius);
       while (true) {
-        part1.position[0] = r + (extent-2*r) * uniformUnitRandomSource.next();
-        part1.position[1] = r + (extent-2*r) * uniformUnitRandomSource.next();
-        part1.position[2] = twoDee ? extent/2 : r + (extent-2*r) * uniformUnitRandomSource.next();
+        part1.position[0] = xvalue.next();
+        part1.position[1] = xvalue.next();
+        part1.position[2] = twoDee ? extent/2 : xvalue.next();
         bool accept = true;
         for(int j = 0; j < i; j++)
         {
