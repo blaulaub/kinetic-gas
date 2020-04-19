@@ -6,7 +6,7 @@ class Vec: public std::array<double,3>
 {
 public:
 
-  double norm() const {
+  double normSquare() const {
     return (*this)*(*this);
   }
 

@@ -89,7 +89,7 @@ void collide(Wall &wall1, Particle &part1)
 void collide(Particle &part1, Particle &part2)
 {
   auto x = part1.position - part2.position;
-  double k1 = x.norm();
+  double k1 = x.normSquare();
   double k2 = 1./sqrt(k1);
   auto w1 = x * k2;
   auto v1 = part1.velocity - part2.velocity;

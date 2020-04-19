@@ -22,9 +22,9 @@ public:
     auto v = part1.velocity - part2.velocity;
     double k1 = v * x;
     if (k1 >= 0) return std::nullopt;
-    double k2 = v.norm();
+    double k2 = v.normSquare();
     double r = part1.radius + part2.radius;
-    double k3 = x.norm() - r*r;
+    double k3 = x.normSquare() - r*r;
     double k4 = 1./k2;
     double k5 = -k1*k4;
     double k6 = -k3*k4;
