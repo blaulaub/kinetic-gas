@@ -14,7 +14,7 @@ jobs:
     steps:
 
     - name: Install ffmpeg devel
-      run: sudo apt-get install libavcodec-dev libavutil-dev
+      run: sudo apt-get install libavcodec-dev libavutil-dev libswscale-dev
     - name: Install cairo devel
       run: sudo apt-get install libcairo2-dev
 
