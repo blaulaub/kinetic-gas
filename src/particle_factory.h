@@ -26,6 +26,7 @@ public:
 
   std::vector<Particle> inOriginCubicle(
     double extent,
+    ValueSource<double> &&radiusSource,
     ValueSource<Vec> &&velocitySource,
     int count)
   {
@@ -36,7 +37,7 @@ public:
     for(int i = 0; i < count; i++)
     {
       auto &part1 = particles[i];
-      part1.radius = r;
+      part1.radius = radiusSource.next();
       while (true) {
         part1.position[0] = r + (extent-2*r) * uniformUnitRandomSource.next();
         part1.position[1] = r + (extent-2*r) * uniformUnitRandomSource.next();

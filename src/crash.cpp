@@ -4,6 +4,7 @@
 #include "particle.h"
 #include "wall.h"
 #include "util/uniform_unit_random_source.h"
+#include "util/random_ranged_double_source.h"
 #include "util/random_unit_velocity_source.h"
 #include "particle_factory.h"
 #include "wall_factory.h"
@@ -106,7 +107,12 @@ int main(int argc, char** args)
   const auto extend = 1.;
 
   vector<Wall> walls = wallFactory.originCubicWalls(extend);
-  vector<Particle> particles = particleFactory.inOriginCubicle(extend, RandomUnitVelocitySource(max_v, twoDee), 100);
+  vector<Particle> particles = particleFactory.inOriginCubicle(
+    extend,
+    RandomRangedDoubleSource(0.015, 0.025),
+    RandomUnitVelocitySource(max_v, twoDee),
+    100
+  );
 
   const auto FPS = 50;
   const int width = 800;

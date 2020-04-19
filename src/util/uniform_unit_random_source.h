@@ -5,7 +5,7 @@
 ///
 /// Provides uniformly distributed random numbers in the range [0., 1.)
 ///
-class UniformUnitRandomSource: public ValueSource<double>
+class UniformUnitRandomSource final: public ValueSource<double>
 {
 public:
   double next() override final;
