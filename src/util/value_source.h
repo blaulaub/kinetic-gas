@@ -1,12 +1,12 @@
 #pragma once
 
 ///
-/// Provides random quantities.
+/// Provides values.
 ///
 template<typename T>
-class RandomSource
+class ValueSource
 {
 public:
-  virtual ~RandomSource() {}
+  virtual ~ValueSource() {}
   virtual T next() = 0;
 };
