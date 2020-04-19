@@ -45,7 +45,8 @@ public:
         {
           auto& part2 = particles[j];
           auto x1 = part1.position - part2.position;
-          double k3 = x1.normSquare() - r*r;
+          auto k4 = part1.radius + part2.radius;
+          double k3 = x1.normSquare() - k4*k4;
           if (k3 < 0)
           {
             accept = false;
