@@ -2,10 +2,11 @@
 
 #include <vector>
 #include <random>
-#include <memory>
 
 #include "particle.h"
 #include "util/uniform_unit_random_source.h"
+#include "util/value_source.h"
+#include "vec.h"
 
 class ParticleFactory
 {
@@ -25,6 +26,7 @@ public:
 
   std::vector<Particle> inOriginCubicle(
     double extent,
+    ValueSource<Vec> &velocitySource,
     int count)
   {
     UniformUnitRandomSource uniformUnitRandomSource;
@@ -55,19 +57,7 @@ public:
         if (accept) break;
       }
 
-      while (true)
-      {
-        double alpha = twoDee ? M_PI/2 : M_PI * uniformUnitRandomSource.next();
-        double r = sin(alpha);
-        double b = uniformUnitRandomSource.next();
-        if (b < r) {
-          double beta = b/r*2*M_PI;
-          part1.velocity[0] = max_v * r * cos(beta);
-          part1.velocity[1] = max_v * r * sin(beta);
-          part1.velocity[2] = max_v * cos(alpha);
-          break;
-        }
-      }
+      part1.velocity = velocitySource.next();
     }
 
     return particles;

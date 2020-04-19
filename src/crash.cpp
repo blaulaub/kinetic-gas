@@ -1,10 +1,10 @@
 #include <optional>
 #include <tuple>
-#include <memory>
 
 #include "particle.h"
 #include "wall.h"
 #include "util/uniform_unit_random_source.h"
+#include "util/random_unit_velocity_source.h"
 #include "particle_factory.h"
 #include "wall_factory.h"
 #include "particle_particle_collision.h"
@@ -105,7 +105,8 @@ int main(int argc, char** args)
 {
   vector<Wall> walls = wallFactory.originCubicWalls(1.);
 
-  vector<Particle> particles = particleFactory.inOriginCubicle(1., 100);
+  RandomUnitVelocitySource randomUnitVelocitySource(max_v, twoDee);
+  vector<Particle> particles = particleFactory.inOriginCubicle(1., randomUnitVelocitySource, 100);
 
   const auto FPS = 50;
   const int width = 800;
