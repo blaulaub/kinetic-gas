@@ -103,10 +103,10 @@ typedef tuple<Event, double> TimedEvent;
 
 int main(int argc, char** args)
 {
-  vector<Wall> walls = wallFactory.originCubicWalls(1.);
+  const auto extend = 1.;
 
-  RandomUnitVelocitySource randomUnitVelocitySource(max_v, twoDee);
-  vector<Particle> particles = particleFactory.inOriginCubicle(1., randomUnitVelocitySource, 100);
+  vector<Wall> walls = wallFactory.originCubicWalls(extend);
+  vector<Particle> particles = particleFactory.inOriginCubicle(extend, RandomUnitVelocitySource(max_v, twoDee), 100);
 
   const auto FPS = 50;
   const int width = 800;

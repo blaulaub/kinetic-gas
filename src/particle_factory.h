@@ -26,7 +26,7 @@ public:
 
   std::vector<Particle> inOriginCubicle(
     double extent,
-    ValueSource<Vec> &velocitySource,
+    ValueSource<Vec> &&velocitySource,
     int count)
   {
     UniformUnitRandomSource uniformUnitRandomSource;
