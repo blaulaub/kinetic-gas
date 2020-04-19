@@ -12,7 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    - name: Install ffmpeg devel
+      run: sudo apt-get install libavcodec-dev libavutil-dev
+    - name: Install cairo devel
+      run: sudo apt-get install libcairo2-dev
+
     - uses: actions/checkout@v2
+
     - name: configure
       run: ./configure
     - name: make
