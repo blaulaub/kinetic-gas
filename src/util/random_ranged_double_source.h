@@ -6,7 +6,7 @@
 ///
 /// Provides uniformly distributed random number for a given range.
 ///
-class RandomRangedDoubleSource: public ValueSource<double>
+class RandomRangedDoubleSource final: public ValueSource<double>
 {
 private:
 

@@ -6,6 +6,7 @@
 #include "util/uniform_unit_random_source.h"
 #include "util/random_ranged_double_source.h"
 #include "util/random_unit_velocity_source.h"
+#include "util/constant_source.h"
 #include "particle_factory.h"
 #include "wall_factory.h"
 #include "particle_particle_collision.h"
@@ -109,7 +110,7 @@ int main(int argc, char** args)
   vector<Wall> walls = wallFactory.originCubicWalls(extend);
   vector<Particle> particles = particleFactory.inOriginCubicle(
     extend,
-    RandomRangedDoubleSource(0.015, 0.025),
+    ConstantSource(0.02),
     RandomUnitVelocitySource(max_v, twoDee),
     100
   );

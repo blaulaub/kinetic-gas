@@ -9,7 +9,7 @@
 ///
 /// Provides velocity vectors with equal spatial distribution.
 ///
-class RandomUnitVelocitySource: public ValueSource<Vec>
+class RandomUnitVelocitySource final: public ValueSource<Vec>
 {
 private:
 
