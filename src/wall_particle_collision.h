@@ -1,10 +1,10 @@
 #pragma once
 
 #include "particle.h"
-#include "timed_event.h"
+#include "collision_event.h"
 #include "wall.h"
 
-class WallParticleCollision : public TimedEvent
+class WallParticleCollision : public CollisionEvent
 {
 public:
   Wall &wall;
@@ -13,5 +13,5 @@ public:
     double time,
     Wall &wall,
     Particle &particle
-  ): TimedEvent(time), wall(wall), particle(particle) {}
+  ): CollisionEvent(time), wall(wall), particle(particle) {}
 };

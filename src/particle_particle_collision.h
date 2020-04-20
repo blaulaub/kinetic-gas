@@ -1,9 +1,9 @@
 #pragma once
 
 #include "particle.h"
-#include "timed_event.h"
+#include "collision_event.h"
 
-class ParticleParticleCollision : public TimedEvent
+class ParticleParticleCollision : public CollisionEvent
 {
 public:
   Particle &particle1;
@@ -12,5 +12,5 @@ public:
     double time,
     Particle &particle1,
     Particle &particle2
-  ): TimedEvent(time), particle1(particle1), particle2(particle2) {}
+  ): CollisionEvent(time), particle1(particle1), particle2(particle2) {}
 };
