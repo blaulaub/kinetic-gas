@@ -85,19 +85,6 @@ void collide(Wall &wall1, Particle &part1)
   part1.velocity = part1.velocity - 2 * k1 * wall1.norm;
 }
 
-void collide(Particle &part1, Particle &part2)
-{
-  auto x = part1.position - part2.position;
-  double k1 = x.normSquare();
-  double k2 = 1./sqrt(k1);
-  auto w1 = x * k2;
-  auto v1 = part1.velocity - part2.velocity;
-  double k3 = v1 * w1;
-  auto k4 = w1 * k3;
-  part1.velocity = part1.velocity - k4;
-  part2.velocity = part2.velocity + k4;
-}
-
 enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
 
 typedef tuple<Event, double> TE;
@@ -147,11 +134,10 @@ int main(int argc, char** args)
     switch(get<0>(deltaT))
     {
       case WALL_PARTICLE:
-        nextWallParticleCollision.value().process();
-        collide(nextParticleCollision.value().particle1, nextParticleCollision.value().particle2);
+        nextParticleCollision.value().process();
         break;
       case PARTICLE_PARTICLE:
-        nextParticleCollision.value().process();
+        nextWallParticleCollision.value().process();
         collide(nextWallParticleCollision.value().wall, nextWallParticleCollision.value().particle);
         break;
       case FRAME:

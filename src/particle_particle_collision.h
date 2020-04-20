@@ -1,7 +1,8 @@
 #pragma once
 
-#include "particle.h"
 #include "collision_event.h"
+
+class Particle;
 
 class ParticleParticleCollision : public CollisionEvent
 {
