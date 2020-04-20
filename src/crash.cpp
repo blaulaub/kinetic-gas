@@ -11,6 +11,7 @@
 #include "wall_factory.h"
 #include "particle_particle_collision.h"
 #include "wall_particle_collision.h"
+#include "frame_event.h"
 #include "collision_predictor.h"
 #include "renderer/renderer.h"
 
@@ -134,7 +135,7 @@ int main(int argc, char** args)
         nextWallParticleCollision.value().process();
         break;
       case FRAME:
-        renderer.render(particles);
+        FrameEvent(time, renderer, particles).process();
         nextFrameTime += 1./FPS;
         break;
       default:
