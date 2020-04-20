@@ -1,16 +1,17 @@
 #pragma once
 
 #include "particle.h"
-#include "timed.h"
+#include "timed_event.h"
 #include "wall.h"
 
-struct WallParticleCollision : public Timed
+class WallParticleCollision : public TimedEvent
 {
+public:
   Wall &wall;
   Particle &particle;
   WallParticleCollision(
     double time,
     Wall &wall,
     Particle &particle
-  ): Timed(time), wall(wall), particle(particle) {}
+  ): TimedEvent(time), wall(wall), particle(particle) {}
 };

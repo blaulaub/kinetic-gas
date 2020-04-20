@@ -100,7 +100,7 @@ void collide(Particle &part1, Particle &part2)
 
 enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
 
-typedef tuple<Event, double> TimedEvent;
+typedef tuple<Event, double> TE;
 
 int main(int argc, char** args)
 {
@@ -128,15 +128,15 @@ int main(int argc, char** args)
 
     // TODO computing next collision each time over is a) inefficient and b) could be inaccurate
 
-    TimedEvent deltaT;
+    TE deltaT;
 
     deltaT = nextParticleCollision && nextParticleCollision.value().time < nextWallParticleCollision.value().time
-      ? (TimedEvent){ WALL_PARTICLE, nextParticleCollision.value().time }
-      : (TimedEvent){ PARTICLE_PARTICLE, nextWallParticleCollision.value().time };
+      ? (TE){ WALL_PARTICLE, nextParticleCollision.value().time }
+      : (TE){ PARTICLE_PARTICLE, nextWallParticleCollision.value().time };
 
     double timeToNextFrame = nextFrameTime - time;
     deltaT = timeToNextFrame < get<1>(deltaT)
-      ? (TimedEvent){ FRAME, timeToNextFrame }
+      ? (TE){ FRAME, timeToNextFrame }
       : deltaT;
 
     // advance particles
