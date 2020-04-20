@@ -79,12 +79,6 @@ optional<ParticleParticleCollision> ofNext(vector<Particle> &particles)
   return nullopt;
 }
 
-void collide(Wall &wall1, Particle &part1)
-{
-  double k1 = part1.velocity * wall1.norm;
-  part1.velocity = part1.velocity - 2 * k1 * wall1.norm;
-}
-
 enum Event { WALL_PARTICLE, PARTICLE_PARTICLE, FRAME };
 
 typedef tuple<Event, double> TE;
@@ -138,7 +132,6 @@ int main(int argc, char** args)
         break;
       case PARTICLE_PARTICLE:
         nextWallParticleCollision.value().process();
-        collide(nextWallParticleCollision.value().wall, nextWallParticleCollision.value().particle);
         break;
       case FRAME:
         renderer.render(particles);
