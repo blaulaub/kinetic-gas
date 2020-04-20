@@ -8,4 +8,6 @@ public:
   TimedEvent (double time): time(time) {}
 
   virtual ~TimedEvent() {}
+
+  virtual void process() = 0;
 };

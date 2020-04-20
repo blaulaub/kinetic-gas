@@ -147,9 +147,11 @@ int main(int argc, char** args)
     switch(get<0>(deltaT))
     {
       case WALL_PARTICLE:
+        nextWallParticleCollision.value().process();
         collide(nextParticleCollision.value().particle1, nextParticleCollision.value().particle2);
         break;
       case PARTICLE_PARTICLE:
+        nextParticleCollision.value().process();
         collide(nextWallParticleCollision.value().wall, nextWallParticleCollision.value().particle);
         break;
       case FRAME:

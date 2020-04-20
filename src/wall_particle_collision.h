@@ -9,9 +9,12 @@ class WallParticleCollision : public CollisionEvent
 public:
   Wall &wall;
   Particle &particle;
+
   WallParticleCollision(
     double time,
     Wall &wall,
     Particle &particle
   ): CollisionEvent(time), wall(wall), particle(particle) {}
+
+  void process() override;
 };
