@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./timed_events/timed_event.h"
+#include "../timed_event.h"
 
 class CollisionEvent: public TimedEvent
 {

@@ -4,9 +4,9 @@ add_executable(crash
   renderer/renderer.cpp
   crash.cpp
   frame_event.cpp
+  timed_events/collision_events/wall_particle_collision.cpp
+  timed_events/collision_events/particle_particle_collision.cpp
   util/value_sources/uniform_unit_random_source.cpp
-  wall_particle_collision.cpp
-  particle_particle_collision.cpp
 )
 
 find_library( AVCODEC avcodec )

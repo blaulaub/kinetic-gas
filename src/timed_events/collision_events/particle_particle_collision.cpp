@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-#include "./dynamic_objects/particle.h"
+#include "../../dynamic_objects/particle.h"
 
 void ParticleParticleCollision::process()
 {
