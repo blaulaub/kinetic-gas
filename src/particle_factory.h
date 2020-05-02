@@ -4,9 +4,9 @@
 #include <random>
 
 #include "./dynamic_objects/particle.h"
-#include "util/uniform_unit_random_source.h"
-#include "util/value_source.h"
-#include "util/random_ranged_double_source.h"
+#include "./util/value_sources/random_ranged_double_source.h"
+#include "./util/value_sources/uniform_unit_random_source.h"
+#include "./util/value_sources/value_source.h"
 #include "vec.h"
 
 class ParticleFactory
