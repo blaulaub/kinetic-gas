@@ -4,7 +4,7 @@
 
 #include "value_source.h"
 #include "uniform_unit_random_source.h"
-#include "../../vec.h"
+#include "../math_types/vec.h"
 
 ///
 /// Provides velocity vectors with equal spatial distribution.
