@@ -1,8 +1,8 @@
 #pragma once
 
-#include "particle.h"
 #include "collision_event.h"
-#include "wall.h"
+#include "./dynamic_objects/particle.h"
+#include "./dynamic_objects/wall.h"
 
 class WallParticleCollision : public CollisionEvent
 {

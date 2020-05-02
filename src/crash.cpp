@@ -1,8 +1,8 @@
 #include <optional>
 #include <tuple>
 
-#include "particle.h"
-#include "wall.h"
+#include "./dynamic_objects/particle.h"
+#include "./dynamic_objects/wall.h"
 #include "util/uniform_unit_random_source.h"
 #include "util/random_ranged_double_source.h"
 #include "util/random_unit_velocity_source.h"

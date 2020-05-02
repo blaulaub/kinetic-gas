@@ -3,7 +3,7 @@
 #include <array>
 
 #include "dynamic_object.h"
-#include "vec.h"
+#include "../vec.h"
 
 class Wall: public DynamicObject
 {

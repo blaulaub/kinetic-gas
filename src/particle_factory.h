@@ -3,7 +3,7 @@
 #include <vector>
 #include <random>
 
-#include "particle.h"
+#include "./dynamic_objects/particle.h"
 #include "util/uniform_unit_random_source.h"
 #include "util/value_source.h"
 #include "util/random_ranged_double_source.h"

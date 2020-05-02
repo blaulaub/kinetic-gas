@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "wall.h"
+#include "./dynamic_objects/wall.h"
 
 class WallFactory
 {

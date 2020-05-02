@@ -7,7 +7,7 @@ extern "C" {
 }
 
 #include <vector>
-#include "../particle.h"
+#include "../dynamic_objects/particle.h"
 
 class BitmapRenderer
 {
